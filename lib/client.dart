@@ -6,4 +6,4 @@
 /// protocol.
 library xml_rpc.client;
 
-export 'src/client.dart' show callMethod, Fault, Base64Value;
+export 'src/client.dart' show call, Fault, Base64Value;

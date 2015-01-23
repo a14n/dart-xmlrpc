@@ -20,7 +20,6 @@ Future call(url, String methodName, List params,
 
   final _headers = <String, String>{
     'Content-Type': 'text/xml',
-    'Content-Length': xml.length.toString(),
   };
   if (headers != null) _headers.addAll(headers);
 
