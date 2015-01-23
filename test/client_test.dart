@@ -20,6 +20,7 @@ main() {
 
     test('Simple call', () {
       httpServer.listen(expectAsync((HttpRequest r) {
+        expect(r.headers['content-length'], isNotNull);
         expect(r.method, equals('POST'));
         UTF8.decodeStream(r).then(expectAsync((String body){
           expect(body, equals('<?xml version="1.0"?>'
