@@ -2,6 +2,7 @@ name: xml_rpc
 version: 0.0.1-dev
 author: Alexandre Ardhuin <alexandre.ardhuin@gmail.com>
 description: A library to communicate through the XML-RPC protocol.
+homepage: https://github.com/a14n/dart-xmlrpc
 dependencies:
   crypto: any
   http: any
