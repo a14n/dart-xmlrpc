@@ -53,7 +53,7 @@ class BoolDecoder extends Decoder<bool> {
     if (!accept(element)) throw new ArgumentError();
     final text = element.text;
     if (text != '0' && text != '1') {
-      throw new FormatException(
+      throw new ArgumentError(
           'The element <bool> must contain 0 or 1. Not "$text"');
     }
     return text == '1';
@@ -136,14 +136,14 @@ class Base64Decoder extends Decoder<Base64Value> {
 class StructEncoder extends Encoder<Map<String, dynamic>> {
   @override
   XmlElement convert(Map<String, dynamic> value) {
-    final result = new XmlElement(new XmlName('struct'), [], []);
+    final members = [];
     value.forEach((k, v) {
-      result.children.add(new XmlElement(new XmlName('member'), [], [
+      members.add(new XmlElement(new XmlName('member'), [], [
         new XmlElement(new XmlName('name'), [], [new XmlText(k)]),
-        new XmlElement(new XmlName('value'), [], [encode(value)])
+        new XmlElement(new XmlName('value'), [], [encode(v)])
       ]));
     });
-    return result;
+    return new XmlElement(new XmlName('struct'), [], members);
   }
 }
 
@@ -154,8 +154,9 @@ class StructDecoder extends Decoder<Map<String, dynamic>> {
     final struct = <String, dynamic>{};
     element.findElements('member').forEach((memberElt) {
       final name = memberElt.findElements('name').first.text;
-      final value = decode(memberElt.findElements('value').first);
-      struct[name] = value;
+      final valueElt = memberElt.findElements('value').first;
+      final elt = valueElt.children.firstWhere((e) => e is XmlElement);
+      struct[name] = decode(elt);
     });
     return struct;
   }
@@ -167,14 +168,12 @@ class StructDecoder extends Decoder<Map<String, dynamic>> {
 class ArrayEncoder extends Encoder<List> {
   @override
   XmlElement convert(List value) {
-    final array = new XmlElement(new XmlName('array'), [], []);
-    final data = new XmlElement(new XmlName('data'), [], []);
-    array.children.add(data);
+    final values = [];
     value.forEach((e) {
-      data.children
-          .add(new XmlElement(new XmlName('value'), [], [encode(value)]));
+      values.add(new XmlElement(new XmlName('value'), [], [encode(e)]));
     });
-    return array;
+    final data = new XmlElement(new XmlName('data'), [], values);
+    return new XmlElement(new XmlName('array'), [], [data]);
   }
 }
 
@@ -184,6 +183,7 @@ class ArrayDecoder extends Decoder<List> {
     if (!accept(element)) throw new ArgumentError();
     return element.findElements('data').first
         .findElements('value')
+        .map((e) => e.children.firstWhere((e) => e is XmlElement))
         .map(decode)
         .toList();
   }
