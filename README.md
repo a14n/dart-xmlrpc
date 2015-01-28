@@ -36,23 +36,23 @@ It will sent the following xml content:
 
 Every xmlrpc call has to be done with the `call(...)` function. You must give
 the url, the method name and the parameters. This function returns a `Future`
-with the result received. If the response contains a <fault> a `Fault` object is
+with the result received. If the response contains a `<fault>` a `Fault` object is
 thrown and can be catch with the `.catchError()` on the `Future`.
 
 ## Parameter types
 
 Here are the conversion table.
 
-| xmlrpc             | Dart                 |
-| ------------------ | -------------------- |
-| <int>              | int                  |
-| <bool>             | bool                 |
-| <string>           | String               |
-| <double>           | double               |
-| <dateTime.iso8601> | DateTime             |
-| <base64>           | Base64Value          |
-| <struct>           | Map<String, dynamic> |
-| <array>            | List                 |
+| xmlrpc               | Dart                 |
+| -------------------- | -------------------- |
+| `<int>`              | int                  |
+| `<bool>`             | bool                 |
+| `<string>`           | String               |
+| `<double>`           | double               |
+| `<dateTime.iso8601>` | DateTime             |
+| `<base64>`           | Base64Value          |
+| `<struct>`           | Map<String, dynamic> |
+| `<array>`            | List                 |
 
 ## Features and bugs
 
