@@ -18,9 +18,7 @@ Future call(url, String methodName, List params,
     {Map<String, String> headers}) {
   final xml = convertMethodCall(methodName, params).toXmlString();
 
-  final _headers = <String, String>{
-    'Content-Type': 'text/xml',
-  };
+  final _headers = <String, String>{'Content-Type': 'text/xml',};
   if (headers != null) _headers.addAll(headers);
 
   final result = new Completer();
