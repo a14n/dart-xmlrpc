@@ -14,6 +14,7 @@ import 'converter.dart';
 
 export 'common.dart';
 
+/// Make a xmlrpc call to the given [url], which can be a [Uri] or a [String].
 Future call(url, String methodName, List params,
     {Map<String, String> headers}) {
   final xml = convertMethodCall(methodName, params).toXmlString();

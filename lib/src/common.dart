@@ -6,13 +6,20 @@ library xml_rpc.src.common;
 
 import 'package:crypto/crypto.dart' show CryptoUtils;
 
+/// An object corresponding to a `<fault>` in the response.
 class Fault {
+  /// The code contained in <faultCode>.
   final int code;
+  /// The text contained in <faultString>.
   final String text;
 
   Fault(this.code, this.text);
+
+  @override
+  String toString() => 'Fault[code:$code,text:$text]';
 }
 
+/// A container for a base64 encoded value.
 class Base64Value {
   String _base64String;
   List<int> _bytes;
