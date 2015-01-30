@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 (2015-01-30)
+
+- Fix: Http exception are not catched.
+
 ## 0.1.0 (2015-01-28)
 
 - First completed version for client side usage.
