@@ -22,13 +22,11 @@ Future call(url, String methodName, List params,
   final _headers = <String, String>{'Content-Type': 'text/xml',};
   if (headers != null) _headers.addAll(headers);
 
-  final result = new Completer();
-  http.post(url, headers: _headers, body: xml).then((response) {
+  return http.post(url, headers: _headers, body: xml).then((response) {
     final value = decodeResponse(parse(response.body));
-    if (value is Fault) result.completeError(value);
-    else result.complete(value);
+    if (value is Fault) new Future.error(value);
+    else return new Future.value(value);
   });
-  return result.future;
 }
 
 XmlDocument convertMethodCall(String methodName, List params) {
