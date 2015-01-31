@@ -45,9 +45,9 @@ Here are the conversion table.
 
 | xmlrpc               | Dart                 |
 | -------------------- | -------------------- |
-| `<int>`              | int                  |
-| `<bool>`             | bool                 |
-| `<string>`           | String               |
+| `<int>` or `<i4>`    | int                  |
+| `<boolean>`          | bool                 |
+| `<string>` or Text   | String               |
 | `<double>`           | double               |
 | `<dateTime.iso8601>` | DateTime             |
 | `<base64>`           | Base64Value          |

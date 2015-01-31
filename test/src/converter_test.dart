@@ -47,28 +47,28 @@ main() {
   group('BoolEncoder', () {
     test('encode true to 1', () {
       expect(new BoolEncoder().convert(true).toXmlString(),
-          equals('<bool>1</bool>'));
+          equals('<boolean>1</boolean>'));
     });
 
     test('encode false to 0', () {
       expect(new BoolEncoder().convert(false).toXmlString(),
-          equals('<bool>0</bool>'));
+          equals('<boolean>0</boolean>'));
     });
   });
 
   group('BoolDecoder', () {
-    test('decode <bool>1</bool>', () {
-      final elt = parse('<bool>1</bool>').firstChild;
+    test('decode <boolean>1</boolean>', () {
+      final elt = parse('<boolean>1</boolean>').firstChild;
       expect(new BoolDecoder().convert(elt), equals(true));
     });
 
-    test('decode <bool>0</bool>', () {
-      final elt = parse('<bool>0</bool>').firstChild;
+    test('decode <boolean>0</boolean>', () {
+      final elt = parse('<boolean>0</boolean>').firstChild;
       expect(new BoolDecoder().convert(elt), equals(false));
     });
 
-    test('throws for <bool>a</bool>', () {
-      final elt = parse('<bool>a</bool>').firstChild;
+    test('throws for <boolean>a</boolean>', () {
+      final elt = parse('<boolean>a</boolean>').firstChild;
       expect(() => new BoolDecoder().convert(elt), throwsArgumentError);
     });
 
@@ -102,7 +102,7 @@ main() {
     });
 
     test('throws for <int>1</int>', () {
-      final elt = parse('<bool>a</bool>').firstChild;
+      final elt = parse('<boolean>a</boolean>').firstChild;
       expect(() => new StringDecoder().convert(elt), throwsArgumentError);
     });
   });
@@ -299,8 +299,8 @@ main() {
       expect(decode(elt), equals(4567));
     });
 
-    test('should accept <bool>', () {
-      final elt = parse('<bool>1</bool>').firstChild;
+    test('should accept <boolean>', () {
+      final elt = parse('<boolean>1</boolean>').firstChild;
       expect(decode(elt), equals(true));
     });
 
@@ -344,7 +344,7 @@ main() {
     });
 
     test('should accept bool', () {
-      expect(encode(true).toXmlString(), equals('<bool>1</bool>'));
+      expect(encode(true).toXmlString(), equals('<boolean>1</boolean>'));
     });
 
     test('should accept double', () {

@@ -43,8 +43,8 @@ class IntDecoder extends Decoder<int> {
 
 class BoolEncoder extends Encoder<bool> {
   @override
-  XmlNode convert(bool value) =>
-      new XmlElement(new XmlName('bool'), [], [new XmlText(value ? '1' : '0')]);
+  XmlNode convert(bool value) => new XmlElement(
+      new XmlName('boolean'), [], [new XmlText(value ? '1' : '0')]);
 }
 
 class BoolDecoder extends Decoder<bool> {
@@ -54,14 +54,14 @@ class BoolDecoder extends Decoder<bool> {
     final text = element.text;
     if (text != '0' && text != '1') {
       throw new ArgumentError(
-          'The element <bool> must contain 0 or 1. Not "$text"');
+          'The element <boolean> must contain 0 or 1. Not "$text"');
     }
     return text == '1';
   }
 
   @override
   bool accept(XmlNode element) =>
-      element is XmlElement && element.name.local == 'bool';
+      element is XmlElement && element.name.local == 'boolean';
 }
 
 class StringEncoder extends Encoder<String> {
