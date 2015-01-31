@@ -39,6 +39,9 @@ the url, the method name and the parameters. This function returns a `Future`
 with the result received. If the response contains a `<fault>` a `Fault` object is
 thrown and can be catch with the `.catchError()` on the `Future`.
 
+To use this package from browser you can provide as `client` optional named
+argument on `call` a `http.BrowserClient`.
+
 ## Parameter types
 
 Here are the conversion table.

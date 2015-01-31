@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2 (2015-01-31)
+
+- Evo: `call` accepts an optional named parameter `client` allowing to make the
+calls from browser.
+- Fix: If no type is indicated, the type is string.
+- Fix: `<boolean>` instead of `<bool>`.
+
 ## 0.1.1 (2015-01-30)
 
 - Fix: Http exception are not catched.
