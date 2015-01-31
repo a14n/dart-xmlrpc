@@ -55,7 +55,7 @@ decodeResponse(XmlDocument document) {
   if (paramsElts.isNotEmpty) {
     final paramElt = paramsElts.first.findElements('param').first;
     final valueElt = paramElt.findElements('value').first;
-    final elt = valueElt.children.firstWhere((e) => e is XmlElement);
+    final elt = getValueContent(valueElt);
     return decode(elt);
   } else {
     int faultCode;
@@ -66,7 +66,7 @@ decodeResponse(XmlDocument document) {
         .forEach((memberElt) {
       final name = memberElt.findElements('name').first.text;
       final valueElt = memberElt.findElements('value').first;
-      final elt = valueElt.children.firstWhere((e) => e is XmlElement);
+      final elt = getValueContent(valueElt);
       final value = decode(elt);
       if (name == 'faultCode') faultCode = value;
       else if (name == 'faultString') faultString = value;

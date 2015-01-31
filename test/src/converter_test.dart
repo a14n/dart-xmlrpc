@@ -5,7 +5,7 @@
 library xml_rpc.src.converter.test;
 
 import 'package:unittest/unittest.dart';
-import 'package:xml/xml.dart' show parse;
+import 'package:xml/xml.dart';
 import 'package:xml_rpc/src/converter.dart';
 import 'package:xml_rpc/src/common.dart';
 
@@ -93,6 +93,11 @@ main() {
 
     test('decode <string>abcde</string>', () {
       final elt = parse('<string>abcde</string>').firstChild;
+      expect(new StringDecoder().convert(elt), equals('abcde'));
+    });
+
+    test('decode simple text', () {
+      final elt = new XmlDocument([new XmlText('abcde')]).firstChild;
       expect(new StringDecoder().convert(elt), equals('abcde'));
     });
 

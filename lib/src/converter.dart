@@ -10,17 +10,17 @@ import 'package:xml/xml.dart';
 
 import 'common.dart';
 
-abstract class Decoder<T> extends Converter<XmlElement, T> {
-  bool accept(XmlElement element);
+abstract class Decoder<T> extends Converter<XmlNode, T> {
+  bool accept(XmlNode node);
 }
 
-abstract class Encoder<T> extends Converter<T, XmlElement> {
+abstract class Encoder<T> extends Converter<T, XmlNode> {
   bool accept(value) => value is T;
 }
 
 class IntEncoder extends Encoder<int> {
   @override
-  XmlElement convert(int value) {
+  XmlNode convert(int value) {
     if (value > 2147483647 || value < -2147483648) {
       throw new ArgumentError('$value must be a four-byte signed integer.');
     }
@@ -31,25 +31,25 @@ class IntEncoder extends Encoder<int> {
 
 class IntDecoder extends Decoder<int> {
   @override
-  int convert(XmlElement element) {
+  int convert(XmlNode element) {
     if (!accept(element)) throw new ArgumentError();
     return int.parse(element.text);
   }
 
   @override
-  bool accept(XmlElement element) =>
-      element.name.local == 'int' || element.name.local == 'i4';
+  bool accept(XmlNode element) => element is XmlElement &&
+      (element.name.local == 'int' || element.name.local == 'i4');
 }
 
 class BoolEncoder extends Encoder<bool> {
   @override
-  XmlElement convert(bool value) =>
+  XmlNode convert(bool value) =>
       new XmlElement(new XmlName('bool'), [], [new XmlText(value ? '1' : '0')]);
 }
 
 class BoolDecoder extends Decoder<bool> {
   @override
-  bool convert(XmlElement element) {
+  bool convert(XmlNode element) {
     if (!accept(element)) throw new ArgumentError();
     final text = element.text;
     if (text != '0' && text != '1') {
@@ -60,46 +60,49 @@ class BoolDecoder extends Decoder<bool> {
   }
 
   @override
-  bool accept(XmlElement element) => element.name.local == 'bool';
+  bool accept(XmlNode element) =>
+      element is XmlElement && element.name.local == 'bool';
 }
 
 class StringEncoder extends Encoder<String> {
   @override
-  XmlElement convert(String value) =>
+  XmlNode convert(String value) =>
       new XmlElement(new XmlName('string'), [], [new XmlText(value)]);
 }
 
 class StringDecoder extends Decoder<String> {
   @override
-  String convert(XmlElement element) {
+  String convert(XmlNode element) {
     if (!accept(element)) throw new ArgumentError();
     return element.text;
   }
 
   @override
-  bool accept(XmlElement element) => element.name.local == 'string';
+  bool accept(XmlNode node) =>
+      node is XmlText || node is XmlElement && node.name.local == 'string';
 }
 
 class DoubleEncoder extends Encoder<double> {
   @override
-  XmlElement convert(double value) => new XmlElement(
+  XmlNode convert(double value) => new XmlElement(
       new XmlName('double'), [], [new XmlText(value.toString())]);
 }
 
 class DoubleDecoder extends Decoder<double> {
   @override
-  double convert(XmlElement element) {
+  double convert(XmlNode element) {
     if (!accept(element)) throw new ArgumentError();
     return double.parse(element.text);
   }
 
   @override
-  bool accept(XmlElement element) => element.name.local == 'double';
+  bool accept(XmlNode element) =>
+      element is XmlElement && element.name.local == 'double';
 }
 
 class DateTimeEncoder extends Encoder<DateTime> {
   @override
-  XmlElement convert(DateTime value) => new XmlElement(
+  XmlNode convert(DateTime value) => new XmlElement(
       new XmlName('dateTime.iso8601'), [], [
     new XmlText(value.toIso8601String())
   ]);
@@ -107,35 +110,37 @@ class DateTimeEncoder extends Encoder<DateTime> {
 
 class DateTimeDecoder extends Decoder<DateTime> {
   @override
-  DateTime convert(XmlElement element) {
+  DateTime convert(XmlNode element) {
     if (!accept(element)) throw new ArgumentError();
     return DateTime.parse(element.text);
   }
 
   @override
-  bool accept(XmlElement element) => element.name.local == 'dateTime.iso8601';
+  bool accept(XmlNode element) =>
+      element is XmlElement && element.name.local == 'dateTime.iso8601';
 }
 
 class Base64Encoder extends Encoder<Base64Value> {
   @override
-  XmlElement convert(Base64Value value) => new XmlElement(
+  XmlNode convert(Base64Value value) => new XmlElement(
       new XmlName('base64'), [], [new XmlText(value.base64String)]);
 }
 
 class Base64Decoder extends Decoder<Base64Value> {
   @override
-  Base64Value convert(XmlElement element) {
+  Base64Value convert(XmlNode element) {
     if (!accept(element)) throw new ArgumentError();
     return new Base64Value.fromBase64String(element.text);
   }
 
   @override
-  bool accept(XmlElement element) => element.name.local == 'base64';
+  bool accept(XmlNode element) =>
+      element is XmlElement && element.name.local == 'base64';
 }
 
 class StructEncoder extends Encoder<Map<String, dynamic>> {
   @override
-  XmlElement convert(Map<String, dynamic> value) {
+  XmlNode convert(Map<String, dynamic> value) {
     final members = [];
     value.forEach((k, v) {
       members.add(new XmlElement(new XmlName('member'), [], [
@@ -149,25 +154,26 @@ class StructEncoder extends Encoder<Map<String, dynamic>> {
 
 class StructDecoder extends Decoder<Map<String, dynamic>> {
   @override
-  Map<String, dynamic> convert(XmlElement element) {
+  Map<String, dynamic> convert(XmlNode element) {
     if (!accept(element)) throw new ArgumentError();
     final struct = <String, dynamic>{};
-    element.findElements('member').forEach((memberElt) {
+    (element as XmlElement).findElements('member').forEach((memberElt) {
       final name = memberElt.findElements('name').first.text;
       final valueElt = memberElt.findElements('value').first;
-      final elt = valueElt.children.firstWhere((e) => e is XmlElement);
+      final elt = getValueContent(valueElt);
       struct[name] = decode(elt);
     });
     return struct;
   }
 
   @override
-  bool accept(XmlElement element) => element.name.local == 'struct';
+  bool accept(XmlNode element) =>
+      element is XmlElement && element.name.local == 'struct';
 }
 
 class ArrayEncoder extends Encoder<List> {
   @override
-  XmlElement convert(List value) {
+  XmlNode convert(List value) {
     final values = [];
     value.forEach((e) {
       values.add(new XmlElement(new XmlName('value'), [], [encode(e)]));
@@ -179,18 +185,22 @@ class ArrayEncoder extends Encoder<List> {
 
 class ArrayDecoder extends Decoder<List> {
   @override
-  List convert(XmlElement element) {
+  List convert(XmlNode element) {
     if (!accept(element)) throw new ArgumentError();
-    return element.findElements('data').first
+    return (element as XmlElement).findElements('data').first
         .findElements('value')
-        .map((e) => e.children.firstWhere((e) => e is XmlElement))
+        .map(getValueContent)
         .map(decode)
         .toList();
   }
 
   @override
-  bool accept(XmlElement element) => element.name.local == 'array';
+  bool accept(XmlNode element) =>
+      element is XmlElement && element.name.local == 'array';
 }
+
+XmlNode getValueContent(XmlElement valueElt) => valueElt.children.firstWhere(
+    (e) => e is XmlElement, orElse: () => valueElt.firstChild);
 
 final encoders = <Encoder>[
   new IntEncoder(),
@@ -203,7 +213,7 @@ final encoders = <Encoder>[
   new ArrayEncoder(),
 ];
 
-XmlElement encode(value) {
+XmlNode encode(value) {
   if (value == null) throw new ArgumentError.notNull();
   return encoders.firstWhere((e) => e.accept(value)).convert(value);
 }
@@ -219,5 +229,5 @@ final decoders = <Decoder>[
   new ArrayDecoder(),
 ];
 
-decode(XmlElement element) =>
-    decoders.firstWhere((e) => e.accept(element)).convert(element);
+decode(XmlNode node) =>
+    decoders.firstWhere((e) => e.accept(node)).convert(node);
