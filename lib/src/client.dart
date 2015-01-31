@@ -6,7 +6,7 @@ library xml_rpc.src.client;
 
 import 'dart:async';
 
-import 'package:http/http.dart' as http show post;
+import 'package:http/http.dart' as http show post, Client;
 import 'package:xml/xml.dart';
 
 import 'common.dart';
@@ -16,15 +16,19 @@ export 'common.dart';
 
 /// Make a xmlrpc call to the given [url], which can be a [Uri] or a [String].
 Future call(url, String methodName, List params,
-    {Map<String, String> headers}) {
+    {Map<String, String> headers, http.Client client}) {
   final xml = convertMethodCall(methodName, params).toXmlString();
 
-  final _headers = <String, String>{'Content-Type': 'text/xml',};
+  final _headers = <String, String>{'Content-Type': 'text/xml'};
   if (headers != null) _headers.addAll(headers);
 
-  return http.post(url, headers: _headers, body: xml).then((response) {
-    final value = decodeResponse(parse(response.body));
-    if (value is Fault) new Future.error(value);
+  final post = client != null ? client.post : http.post;
+
+  return post(url, headers: _headers, body: xml).then((response) {
+    if (response.statusCode != 200) return new Future.error(response);
+    final body = response.body;
+    final value = decodeResponse(parse(body));
+    if (value is Fault) return new Future.error(value);
     else return new Future.value(value);
   });
 }
