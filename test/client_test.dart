@@ -20,7 +20,7 @@ main() {
 
   test('Simple call', () {
     httpServer.listen(expectAsync((HttpRequest r) {
-      expect(r.headers['content-length'], isNotNull);
+      expect(r.headers.contentLength, isNotNull);
       expect(r.method, equals('POST'));
       UTF8.decodeStream(r).then(expectAsync((String body) {
         expect(body, equals('<?xml version="1.0"?>'
@@ -39,6 +39,32 @@ main() {
     }));
     call('http://localhost:${httpServer.port}', 'm1', []).then(expectAsync((e) {
       expect(e, equals('South Dakota'));
+    }));
+  });
+
+  test('Specify encoding', () {
+    httpServer.listen(expectAsync((HttpRequest r) {
+      expect(r.headers.contentLength, isNotNull);
+      expect(r.headers.contentType.charset, equals('iso-8859-1'));
+      expect(r.method, equals('POST'));
+      LATIN1.decodeStream(r).then(expectAsync((String body) {
+        expect(body, equals('<?xml version="1.0"?>'
+            '<methodCall><methodName>éà</methodName></methodCall>'));
+        r.response.write('''
+<?xml version="1.0"?>
+<methodResponse>
+  <params>
+    <param>
+      <value><string>éçàù</string></value>
+    </param>
+  </params>
+</methodResponse>''');
+        r.response.close();
+      }));
+    }));
+    call('http://localhost:${httpServer.port}', 'éà', [], encoding: LATIN1)
+        .then(expectAsync((e) {
+      expect(e, equals('éçàù'));
     }));
   });
 

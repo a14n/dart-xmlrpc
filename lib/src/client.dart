@@ -5,6 +5,7 @@
 library xml_rpc.src.client;
 
 import 'dart:async';
+import 'dart:convert' show Encoding;
 
 import 'package:http/http.dart' as http show post, Client;
 import 'package:xml/xml.dart';
@@ -15,8 +16,10 @@ import 'converter.dart';
 export 'common.dart';
 
 /// Make a xmlrpc call to the given [url], which can be a [Uri] or a [String].
+///
+/// [encoding] defaults to [UTF8].
 Future call(url, String methodName, List params,
-    {Map<String, String> headers, http.Client client}) {
+    {Map<String, String> headers, Encoding encoding, http.Client client}) {
   final xml = convertMethodCall(methodName, params).toXmlString();
 
   final _headers = <String, String>{'Content-Type': 'text/xml'};
@@ -24,7 +27,8 @@ Future call(url, String methodName, List params,
 
   final post = client != null ? client.post : http.post;
 
-  return post(url, headers: _headers, body: xml).then((response) {
+  return post(url, headers: _headers, body: xml, encoding: encoding).then(
+      (response) {
     if (response.statusCode != 200) return new Future.error(response);
     final body = response.body;
     final value = decodeResponse(parse(body));

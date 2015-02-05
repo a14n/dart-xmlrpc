@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3 (2015-02-05)
+
+- Evo: allow to specify encoding for calls.
+
 ## 0.1.2 (2015-01-31)
 
 - Evo: `call` accepts an optional named parameter `client` allowing to make the
