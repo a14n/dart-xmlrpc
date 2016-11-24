@@ -23,8 +23,10 @@ main() {
       expect(r.headers.contentLength, isNotNull);
       expect(r.method, equals('POST'));
       UTF8.decodeStream(r).then(expectAsync((String body) {
-        expect(body, equals('<?xml version="1.0"?>'
-            '<methodCall><methodName>m1</methodName></methodCall>'));
+        expect(
+            body,
+            equals('<?xml version="1.0"?>'
+                '<methodCall><methodName>m1</methodName></methodCall>'));
         r.response.write('''
 <?xml version="1.0"?>
 <methodResponse>
@@ -48,8 +50,10 @@ main() {
       expect(r.headers.contentType.charset, equals('iso-8859-1'));
       expect(r.method, equals('POST'));
       LATIN1.decodeStream(r).then(expectAsync((String body) {
-        expect(body, equals('<?xml version="1.0"?>'
-            '<methodCall><methodName>éà</methodName></methodCall>'));
+        expect(
+            body,
+            equals('<?xml version="1.0"?>'
+                '<methodCall><methodName>éà</methodName></methodCall>'));
         r.response.write('''
 <?xml version="1.0"?>
 <methodResponse>
@@ -70,8 +74,8 @@ main() {
 
   test('Call with error', () {
     httpServer.listen((_) => httpServer.close(force: true));
-    call('http://localhost:${httpServer.port}', 'm1', [1]).catchError(
-        expectAsync((e) {
+    call('http://localhost:${httpServer.port}', 'm1', [1])
+        .catchError(expectAsync((e) {
       expect(e, new isInstanceOf<ClientException>());
     }));
   });

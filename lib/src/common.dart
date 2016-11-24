@@ -10,6 +10,7 @@ import 'dart:convert';
 class Fault {
   /// The code contained in <faultCode>.
   final int code;
+
   /// The text contained in <faultString>.
   final String text;
 

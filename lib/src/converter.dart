@@ -37,7 +37,8 @@ class IntDecoder extends Decoder<int> {
   }
 
   @override
-  bool accept(XmlNode element) => element is XmlElement &&
+  bool accept(XmlNode element) =>
+      element is XmlElement &&
       (element.name.local == 'int' || element.name.local == 'i4');
 }
 
@@ -103,9 +104,9 @@ class DoubleDecoder extends Decoder<double> {
 class DateTimeEncoder extends Encoder<DateTime> {
   @override
   XmlNode convert(DateTime value) => new XmlElement(
-      new XmlName('dateTime.iso8601'), [], [
-    new XmlText(value.toIso8601String())
-  ]);
+      new XmlName('dateTime.iso8601'),
+      [],
+      [new XmlText(value.toIso8601String())]);
 }
 
 class DateTimeDecoder extends Decoder<DateTime> {
@@ -187,7 +188,9 @@ class ArrayDecoder extends Decoder<List> {
   @override
   List convert(XmlNode element) {
     if (!accept(element)) throw new ArgumentError();
-    return (element as XmlElement).findElements('data').first
+    return (element as XmlElement)
+        .findElements('data')
+        .first
         .findElements('value')
         .map(getValueContent)
         .map(decode)
@@ -199,8 +202,8 @@ class ArrayDecoder extends Decoder<List> {
       element is XmlElement && element.name.local == 'array';
 }
 
-XmlNode getValueContent(XmlElement valueElt) => valueElt.children.firstWhere(
-    (e) => e is XmlElement, orElse: () => valueElt.firstChild);
+XmlNode getValueContent(XmlElement valueElt) => valueElt.children
+    .firstWhere((e) => e is XmlElement, orElse: () => valueElt.firstChild);
 
 final encoders = <Encoder>[
   new IntEncoder(),
