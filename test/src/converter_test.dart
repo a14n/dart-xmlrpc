@@ -4,7 +4,7 @@
 
 library xml_rpc.src.converter.test;
 
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_rpc/src/converter.dart';
 import 'package:xml_rpc/src/common.dart';

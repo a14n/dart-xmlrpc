@@ -9,7 +9,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:xml_rpc/client.dart';
 
 main() {

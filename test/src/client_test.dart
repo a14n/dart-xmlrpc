@@ -4,7 +4,7 @@
 
 library xml_rpc.src.client.test;
 
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:xml/xml.dart' show parse;
 import 'package:xml_rpc/src/client.dart';
 
