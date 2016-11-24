@@ -4,7 +4,7 @@
 
 library xml_rpc.src.common;
 
-import 'package:crypto/crypto.dart' show CryptoUtils;
+import 'dart:convert';
 
 /// An object corresponding to a `<fault>` in the response.
 class Fault {
@@ -29,14 +29,14 @@ class Base64Value {
 
   String get base64String {
     if (_base64String == null) {
-      _base64String = CryptoUtils.bytesToBase64(_bytes);
+      _base64String = BASE64.encode(_bytes);
     }
     return _base64String;
   }
 
   List<int> get bytes {
     if (_bytes == null) {
-      _bytes = CryptoUtils.base64StringToBytes(_base64String);
+      _bytes = BASE64.decode(_base64String);
     }
     return _bytes;
   }

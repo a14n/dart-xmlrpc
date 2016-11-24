@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4 (2016-11-24)
+
+- Evo: remove crypto dependency
+
 ## 0.1.3 (2015-02-05)
 
 - Evo: allow to specify encoding for calls.
