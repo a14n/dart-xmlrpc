@@ -39,7 +39,7 @@ class IntDecoder extends Decoder<int> {
   @override
   bool accept(XmlNode element) =>
       element is XmlElement &&
-      (element.name.local == 'int' || element.name.local == 'i4');
+      (element.name.local == 'int' || element.name.local == 'i4' || element.name.local == 'i8');
 }
 
 class BoolEncoder extends Encoder<bool> {
