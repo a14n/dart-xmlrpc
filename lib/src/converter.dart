@@ -142,7 +142,7 @@ class Base64Decoder extends Decoder<Base64Value> {
 class StructEncoder extends Encoder<Map<String, dynamic>> {
   @override
   XmlNode convert(Map<String, dynamic> value) {
-    final members = [];
+    final members = <XmlNode>[];
     value.forEach((k, v) {
       members.add(new XmlElement(new XmlName('member'), [], [
         new XmlElement(new XmlName('name'), [], [new XmlText(k)]),
@@ -175,7 +175,7 @@ class StructDecoder extends Decoder<Map<String, dynamic>> {
 class ArrayEncoder extends Encoder<List> {
   @override
   XmlNode convert(List value) {
-    final values = [];
+    final values = <XmlNode>[];
     value.forEach((e) {
       values.add(new XmlElement(new XmlName('value'), [], [encode(e)]));
     });
@@ -218,7 +218,11 @@ final encoders = <Encoder>[
 
 XmlNode encode(value) {
   if (value == null) throw new ArgumentError.notNull();
-  return encoders.firstWhere((e) => e.accept(value)).convert(value);
+  return encoders
+      .firstWhere((e) => e.accept(value),
+          orElse: () =>
+              throw new ArgumentError('No encoder to encode the value'))
+      .convert(value);
 }
 
 final decoders = <Decoder>[
@@ -232,5 +236,7 @@ final decoders = <Decoder>[
   new ArrayDecoder(),
 ];
 
-decode(XmlNode node) =>
-    decoders.firstWhere((e) => e.accept(node)).convert(node);
+decode(XmlNode node) => decoders
+    .firstWhere((e) => e.accept(node),
+        orElse: () => throw new ArgumentError('No decoder to decode the node'))
+    .convert(node);

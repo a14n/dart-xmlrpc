@@ -334,7 +334,7 @@ main() {
 
     test('throws on <unknown>', () {
       final elt = parse('<unknown>1</unknown>').firstChild;
-      expect(() => decode(elt), throws);
+      expect(() => decode(elt), throwsArgumentError);
     });
   });
 
@@ -366,7 +366,7 @@ main() {
     });
 
     test('should throw on Map<int, dynamic>', () {
-      expect(() => encode(<int, dynamic>{1: 2}), throws);
+      expect(() => encode(<int, dynamic>{1: 2}), throwsArgumentError);
     });
 
     test('should accept List', () {
@@ -374,7 +374,7 @@ main() {
     });
 
     test('throws on Object', () {
-      expect(() => encode(new Object()), throws);
+      expect(() => encode(new Object()), throwsArgumentError);
     });
   });
 }

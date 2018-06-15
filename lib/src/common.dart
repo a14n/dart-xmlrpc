@@ -30,14 +30,14 @@ class Base64Value {
 
   String get base64String {
     if (_base64String == null) {
-      _base64String = BASE64.encode(_bytes);
+      _base64String = base64.encode(_bytes);
     }
     return _base64String;
   }
 
   List<int> get bytes {
     if (_bytes == null) {
-      _bytes = BASE64.decode(_base64String);
+      _bytes = base64.decode(_base64String);
     }
     return _bytes;
   }
