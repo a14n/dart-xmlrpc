@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 (2018-06-18)
+
+- Switch to Dart 2.
+- Allow to specify the encoders/decoders used. This allows to communicate
+with XML-RPC implementation that have extensions like `<nil>`, `<i8>`...
+- Expose a `client_c.dart` library that directly handle `<nil>` and `<i8>`
+extension types.
+
 ## 0.1.4 (2016-11-24)
 
 - Evo: remove crypto dependency
