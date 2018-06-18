@@ -57,6 +57,60 @@ Here are the conversion table.
 | `<struct>`           | Map<String, dynamic> |
 | `<array>`            | List                 |
 
+## XML-RPC Extension Types
+
+Some XML-RPC implementations handle additionnal types. For instance [Apache ws-xmlrpc](https://ws.apache.org/xmlrpc)
+may support long values with `<i8>` and other types (see https://ws.apache.org/xmlrpc/types.html).
+
+You can provide custom codecs that will be used to encode and decode those
+values.
+
+If you use the [XML-RPC for C and C++](http://xmlrpc-c.sourceforge.net) library
+on the server side you can directly use the dart library `client_c.dart` to be
+able to handle `<i8>` and `<nil>`.
+
+## Using this package on JS side
+
+If you use this package on JS side you may face some problem dealing with
+numbers. On JS side there are no difference between `int` and `double`. So by
+default an double `1.0` will be encoded as `<int>1</int>`.
+
+You can workaround this issue:
+- wrap doubles in a custom type:
+  ```dart
+  class Double {
+    Double(this.value);
+    final double value;
+  }
+  ```
+- create a codec for this wrapper type:
+  ```dart
+  final doubleWrapperCodec = new SimpleCodec<Double>(
+    nodeLocalName: 'double',
+    encodeValue: (value) => value.value,
+    decodeValue: (text) => new Double(double.parse(text)),
+  );
+  ```
+- create a list of codecs:
+  ```dart
+  final codecs = new List<Codec>.unmodifiable(<Codec>[
+    doubleWrapperCodec,
+    intCodec,
+    boolCodec,
+    stringCodec,
+    dateTimeCodec,
+    base64Codec,
+    structCodec,
+    arrayCodec,
+  ]);
+  ```
+- make calls with your codecs:
+  ```dart
+  main() {
+    xml_rpc.call(url, 'method', [params], encodeCodecs: codecs, decodeCodecs: codecs);
+  }
+  ```
+
 ## Features and bugs
 
 Please file feature requests and bugs at the [issue tracker][tracker].

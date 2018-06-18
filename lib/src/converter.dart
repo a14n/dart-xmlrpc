@@ -8,10 +8,10 @@ import 'package:xml/xml.dart';
 import 'common.dart';
 
 final standardCodecs = new List<Codec>.unmodifiable(<Codec>[
+  doubleCodec,
   intCodec,
   boolCodec,
   stringCodec,
-  doubleCodec,
   dateTimeCodec,
   base64Codec,
   structCodec,
