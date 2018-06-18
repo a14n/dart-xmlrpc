@@ -7,6 +7,7 @@ environment:
   sdk: '>=2.0.0-dev.62.0 <2.0.0'
 dependencies:
   http: ^0.11.0
+  meta: ^1.1.5
   xml: ^3.0.0
 dev_dependencies:
   test: ^0.12.41

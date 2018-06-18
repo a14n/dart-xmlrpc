@@ -7,11 +7,14 @@ library xml_rpc.src.client.test;
 import 'package:test/test.dart';
 import 'package:xml/xml.dart' show parse;
 import 'package:xml_rpc/src/client.dart';
+import 'package:xml_rpc/src/converter.dart';
 
 main() {
   group('convertMethodCall', () {
     test('for method without parameter', () {
-      expect(convertMethodCall('m1', []).toXmlString(pretty: true), equals('''
+      expect(
+          convertMethodCall('m1', [], standardCodecs).toXmlString(pretty: true),
+          equals('''
 <?xml version="1.0"?>
 <methodCall>
   <methodName>m1</methodName>
@@ -19,7 +22,10 @@ main() {
     });
 
     test('for method with 1 parameter', () {
-      expect(convertMethodCall('m1', [1]).toXmlString(pretty: true), equals('''
+      expect(
+          convertMethodCall('m1', [1], standardCodecs)
+              .toXmlString(pretty: true),
+          equals('''
 <?xml version="1.0"?>
 <methodCall>
   <methodName>m1</methodName>
@@ -34,7 +40,9 @@ main() {
     });
 
     test('for method with 2 parameters', () {
-      expect(convertMethodCall('m1', [1, 'a']).toXmlString(pretty: true),
+      expect(
+          convertMethodCall('m1', [1, 'a'], standardCodecs)
+              .toXmlString(pretty: true),
           equals('''
 <?xml version="1.0"?>
 <methodCall>
@@ -65,7 +73,7 @@ main() {
       <value><string>South Dakota</string></value>
     </param>
   </params>
-</methodResponse>''')), equals('South Dakota'));
+</methodResponse>'''), standardCodecs), equals('South Dakota'));
     });
 
     test('for fault', () {
@@ -86,7 +94,7 @@ main() {
       </struct>
     </value>
   </fault>
-</methodResponse>'''));
+</methodResponse>'''), standardCodecs);
       expect(result, new isInstanceOf<Fault>());
       result = result as Fault;
       expect(result.code, equals(4));

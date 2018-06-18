@@ -2,9 +2,7 @@
 // source code is governed by a BSD-style license that can be found in the
 // LICENSE file.
 
-library xml_rpc.src.common;
-
-import 'dart:convert';
+import 'dart:convert' show base64;
 
 /// An object corresponding to a `<fault>` in the response.
 class Fault {
