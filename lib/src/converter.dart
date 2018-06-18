@@ -150,12 +150,12 @@ class _StructCodec implements Codec<Map<String, dynamic>> {
       throw new ArgumentError();
 
     final struct = <String, dynamic>{};
-    (node as XmlElement).findElements('member').forEach((memberElt) {
-      final name = memberElt.findElements('name').first.text;
-      final valueElt = memberElt.findElements('value').first;
+    for (final member in (node as XmlElement).findElements('member')) {
+      final name = member.findElements('name').first.text;
+      final valueElt = member.findElements('value').first;
       final elt = getValueContent(valueElt);
       struct[name] = decode(elt);
-    });
+    }
     return struct;
   }
 }
@@ -197,16 +197,20 @@ XmlNode encode(value, List<Codec> codecs) {
   for (final codec in codecs) {
     try {
       return codec.encode(value, (v) => encode(v, codecs));
-    } on ArgumentError {}
+    } on ArgumentError {
+      // this codec don't support this value
+    }
   }
   throw new ArgumentError('No encoder to encode the value');
 }
 
-decode(XmlNode node, List<Codec> codecs) {
+dynamic decode(XmlNode node, List<Codec> codecs) {
   for (final codec in codecs) {
     try {
       return codec.decode(node, (v) => decode(v, codecs));
-    } on ArgumentError {}
+    } on ArgumentError {
+      // this codec don't support this xml node
+    }
   }
   throw new ArgumentError('No decoder to decode the value');
 }

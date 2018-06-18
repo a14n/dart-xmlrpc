@@ -26,17 +26,7 @@ class Base64Value {
   Base64Value(this._bytes);
   Base64Value.fromBase64String(this._base64String);
 
-  String get base64String {
-    if (_base64String == null) {
-      _base64String = base64.encode(_bytes);
-    }
-    return _base64String;
-  }
+  String get base64String => _base64String ??= base64.encode(_bytes);
 
-  List<int> get bytes {
-    if (_bytes == null) {
-      _bytes = base64.decode(_base64String);
-    }
-    return _bytes;
-  }
+  List<int> get bytes => _bytes ??= base64.decode(_base64String);
 }

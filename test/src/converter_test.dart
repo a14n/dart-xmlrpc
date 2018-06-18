@@ -9,7 +9,7 @@ import 'package:xml/xml.dart';
 import 'package:xml_rpc/src/common.dart';
 import 'package:xml_rpc/src/converter.dart';
 
-main() {
+void main() {
   group('intCodec', () {
     test('encode 1', () {
       expect(intCodec.encode(1, null).toXmlString(), equals('<int>1</int>'));
@@ -309,7 +309,7 @@ main() {
 
     test('should accept <base64>', () {
       final elt = parse('<base64>AQID</base64>').firstChild;
-      expect(decode(elt, standardCodecs), new isInstanceOf<Base64Value>());
+      expect(decode(elt, standardCodecs), const isInstanceOf<Base64Value>());
       expect((decode(elt, standardCodecs) as Base64Value).base64String,
           equals('AQID'));
       expect((decode(elt, standardCodecs) as Base64Value).bytes,

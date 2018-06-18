@@ -33,7 +33,7 @@ final _codecs = new List<Codec>.unmodifiable(<Codec>[]
   ..add(nilCodec));
 
 Future call(
-  url,
+  dynamic url,
   String methodName,
   List params, {
   Map<String, String> headers,

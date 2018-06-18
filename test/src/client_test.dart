@@ -9,7 +9,7 @@ import 'package:xml/xml.dart' show parse;
 import 'package:xml_rpc/src/client.dart';
 import 'package:xml_rpc/src/converter.dart';
 
-main() {
+void main() {
   group('convertMethodCall', () {
     test('for method without parameter', () {
       expect(
@@ -95,7 +95,7 @@ main() {
     </value>
   </fault>
 </methodResponse>'''), standardCodecs);
-      expect(result, new isInstanceOf<Fault>());
+      expect(result, const isInstanceOf<Fault>());
       result = result as Fault;
       expect(result.code, equals(4));
       expect(result.text, equals('Too many parameters.'));

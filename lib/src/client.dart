@@ -10,14 +10,14 @@ import 'dart:convert' show Encoding, utf8;
 import 'package:http/http.dart' as http show post, Client;
 import 'package:xml/xml.dart';
 
-import 'converter.dart';
 import 'common.dart';
+import 'converter.dart';
 
 export 'common.dart';
 
 /// Make a xmlrpc call to the given [url], which can be a [Uri] or a [String].
 Future call(
-  url,
+  dynamic url,
   String methodName,
   List params, {
   Map<String, String> headers,
@@ -66,7 +66,7 @@ XmlDocument convertMethodCall(
   ]);
 }
 
-decodeResponse(XmlDocument document, List<Codec> decodeCodecs) {
+dynamic decodeResponse(XmlDocument document, List<Codec> decodeCodecs) {
   final responseElt = document.findElements('methodResponse').first;
   final paramsElts = responseElt.findElements('params');
   if (paramsElts.isNotEmpty) {
@@ -77,26 +77,24 @@ decodeResponse(XmlDocument document, List<Codec> decodeCodecs) {
   } else {
     int faultCode;
     String faultString;
-    responseElt
+    final members = responseElt
         .findElements('fault')
         .first
         .findElements('value')
         .first
         .findElements('struct')
         .first
-        .findElements('member')
-        .forEach((memberElt) {
-      final name = memberElt.findElements('name').first.text;
-      final valueElt = memberElt.findElements('value').first;
+        .findElements('member');
+    for (final member in members) {
+      final name = member.findElements('name').first.text;
+      final valueElt = member.findElements('value').first;
       final elt = getValueContent(valueElt);
       final value = decode(elt, decodeCodecs);
       if (name == 'faultCode')
         faultCode = value as int;
       else if (name == 'faultString')
         faultString = value as String;
-      else
-        throw new FormatException();
-    });
+    }
     return new Fault(faultCode, faultString);
   }
 }
