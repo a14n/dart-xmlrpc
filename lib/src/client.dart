@@ -40,10 +40,11 @@ Future call(
   if (response.statusCode != 200) return new Future.error(response);
   final body = response.body;
   final value = decodeResponse(parse(body), decodeCodecs);
-  if (value is Fault)
+  if (value is Fault) {
     return new Future.error(value);
-  else
+  } else {
     return new Future.value(value);
+  }
 }
 
 XmlDocument convertMethodCall(
@@ -90,10 +91,11 @@ dynamic decodeResponse(XmlDocument document, List<Codec> decodeCodecs) {
       final valueElt = member.findElements('value').first;
       final elt = getValueContent(valueElt);
       final value = decode(elt, decodeCodecs);
-      if (name == 'faultCode')
+      if (name == 'faultCode') {
         faultCode = value as int;
-      else if (name == 'faultString')
+      } else if (name == 'faultString') {
         faultString = value as String;
+      }
     }
     return new Fault(faultCode, faultString);
   }
