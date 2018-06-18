@@ -41,7 +41,7 @@ class SimpleCodec<T> implements Codec<T> {
     return new XmlElement(
       new XmlName(nodeLocalName),
       [],
-      [new XmlText(encodeValue(value))],
+      [new XmlText(encodeValue(value as T))],
     );
   }
 
@@ -135,7 +135,7 @@ class _StructCodec implements Codec<Map<String, dynamic>> {
     if (value is! Map<String, dynamic>) throw new ArgumentError();
 
     final members = <XmlNode>[];
-    value.forEach((k, v) {
+    (value as Map<String, dynamic>).forEach((k, v) {
       members.add(new XmlElement(new XmlName('member'), [], [
         new XmlElement(new XmlName('name'), [], [new XmlText(k)]),
         new XmlElement(new XmlName('value'), [], [encode(v)])

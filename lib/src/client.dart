@@ -91,9 +91,9 @@ decodeResponse(XmlDocument document, List<Codec> decodeCodecs) {
       final elt = getValueContent(valueElt);
       final value = decode(elt, decodeCodecs);
       if (name == 'faultCode')
-        faultCode = value;
+        faultCode = value as int;
       else if (name == 'faultString')
-        faultString = value;
+        faultString = value as String;
       else
         throw new FormatException();
     });
