@@ -78,23 +78,23 @@ default an double `1.0` will be encoded as `<int>1</int>`.
 You can workaround this issue:
 - wrap doubles in a custom type:
   ```dart
-  class Double {
-    Double(this.value);
+  class _Double {
+    _Double(this.value) : assert(value != null);
     final double value;
   }
   ```
 - create a codec for this wrapper type:
   ```dart
-  final doubleWrapperCodec = new SimpleCodec<Double>(
+  final _doubleWrapperCodec = new SimpleCodec<_Double>(
     nodeLocalName: 'double',
-    encodeValue: (value) => value.value,
-    decodeValue: (text) => new Double(double.parse(text)),
+    encodeValue: (value) => value.value.toString(),
+    decodeValue: (text) => new _Double(double.parse(text)),
   );
   ```
 - create a list of codecs:
   ```dart
   final codecs = new List<Codec>.unmodifiable(<Codec>[
-    doubleWrapperCodec,
+    _doubleWrapperCodec,
     intCodec,
     boolCodec,
     stringCodec,
