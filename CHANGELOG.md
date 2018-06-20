@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2018-06-20)
+
+- Handle `<value />` that can occur with empty strings.
+
 ## 0.2.0 (2018-06-18)
 
 - Switch to Dart 2.

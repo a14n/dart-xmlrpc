@@ -221,6 +221,24 @@ void main() {
       expect(structCodec.decode(elt, null), equals({}));
     });
 
+    test('decode struct with empty string value', () {
+      final elt = parse('''
+<struct>
+  <member>
+    <name />
+    <value>
+      <int>1</int>
+    </value>
+  </member>
+  <member>
+    <name>b</name>
+    <value />
+  </member>
+</struct>''').firstChild;
+      expect(structCodec.decode(elt, (n) => decode(n, standardCodecs)),
+          equals({'': 1, 'b': ''}));
+    });
+
     test('throws for <string>1</string>', () {
       final elt = parse('<string>1</string>').firstChild;
       expect(() => structCodec.decode(elt, null), throwsArgumentError);

@@ -102,10 +102,12 @@ class _StringCodec extends SimpleCodec<String> {
 
   @override
   String decode(XmlNode node, Function(XmlNode) decode) {
-    if (!(node is XmlText || node is XmlElement && node.name.local == 'string'))
+    if (!(node == null || // with empty String that leads to "<value />"
+        node is XmlText ||
+        node is XmlElement && node.name.local == 'string'))
       throw new ArgumentError();
 
-    return node.text;
+    return node == null ? '' : node.text;
   }
 }
 
