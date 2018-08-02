@@ -95,7 +95,7 @@ void main() {
     </value>
   </fault>
 </methodResponse>'''), standardCodecs);
-      expect(result, const isInstanceOf<Fault>());
+      expect(result, const TypeMatcher<Fault>());
       result = result as Fault;
       expect(result.code, equals(4));
       expect(result.text, equals('Too many parameters.'));

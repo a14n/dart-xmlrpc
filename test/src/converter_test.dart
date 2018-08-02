@@ -193,7 +193,8 @@ void main() {
     });
 
     test('encode empty map correctly', () {
-      expect(structCodec.encode({}, null).toXmlString(), equals('<struct />'));
+      expect(structCodec.encode(<String, dynamic>{}, null).toXmlString(),
+          equals('<struct />'));
     });
 
     test('decode struct', () {
@@ -327,7 +328,7 @@ void main() {
 
     test('should accept <base64>', () {
       final elt = parse('<base64>AQID</base64>').firstChild;
-      expect(decode(elt, standardCodecs), const isInstanceOf<Base64Value>());
+      expect(decode(elt, standardCodecs), const TypeMatcher<Base64Value>());
       expect((decode(elt, standardCodecs) as Base64Value).base64String,
           equals('AQID'));
       expect((decode(elt, standardCodecs) as Base64Value).bytes,
@@ -380,7 +381,8 @@ void main() {
     });
 
     test('should accept Map<String, dynamic>', () {
-      expect(encode({}, standardCodecs).toXmlString(), equals('<struct />'));
+      expect(encode(<String, dynamic>{}, standardCodecs).toXmlString(),
+          equals('<struct />'));
     });
 
     test('should throw on Map<int, dynamic>', () {

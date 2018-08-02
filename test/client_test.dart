@@ -77,7 +77,7 @@ void main() {
     httpServer.listen((_) => httpServer.close(force: true));
     call('http://localhost:${httpServer.port}', 'm1', [1])
         .catchError(expectAsync1((e) {
-      expect(e, const isInstanceOf<ClientException>());
+      expect(e, const TypeMatcher<ClientException>());
     }));
   });
 }
