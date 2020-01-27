@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3 (2020-01-27)
+
+- Bump some dependencies.
+
 ## 0.2.2 (2018-08-01)
 
 - Migration to Dart 2.
