@@ -11,7 +11,7 @@ import 'package:xml_rpc/src/converter_extension.dart';
 void main() {
   group('nilCodec', () {
     test('encode null', () {
-      expect(nilCodec.encode(null, null).toXmlString(), equals('<nil />'));
+      expect(nilCodec.encode(null, null).toXmlString(), equals('<nil/>'));
     });
 
     test('decode <nil></nil>', () {
@@ -19,8 +19,8 @@ void main() {
       expect(nilCodec.decode(elt, null), equals(null));
     });
 
-    test('decode <nil />', () {
-      final elt = parse('<nil />').firstChild;
+    test('decode <nil/>', () {
+      final elt = parse('<nil/>').firstChild;
       expect(nilCodec.decode(elt, null), equals(null));
     });
   });

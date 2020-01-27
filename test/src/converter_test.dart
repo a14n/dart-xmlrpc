@@ -194,7 +194,7 @@ void main() {
 
     test('encode empty map correctly', () {
       expect(structCodec.encode(<String, dynamic>{}, null).toXmlString(),
-          equals('<struct />'));
+          equals('<struct/>'));
     });
 
     test('decode struct', () {
@@ -267,7 +267,7 @@ void main() {
 
     test('encode empty list correctly', () {
       expect(arrayCodec.encode([], null).toXmlString(),
-          equals('<array><data /></array>'));
+          equals('<array><data/></array>'));
     });
 
     test('decode array', () {
@@ -382,7 +382,7 @@ void main() {
 
     test('should accept Map<String, dynamic>', () {
       expect(encode(<String, dynamic>{}, standardCodecs).toXmlString(),
-          equals('<struct />'));
+          equals('<struct/>'));
     });
 
     test('should throw on Map<int, dynamic>', () {
@@ -392,7 +392,7 @@ void main() {
 
     test('should accept List', () {
       expect(encode([], standardCodecs).toXmlString(),
-          equals('<array><data /></array>'));
+          equals('<array><data/></array>'));
     });
 
     test('throws on Object', () {
