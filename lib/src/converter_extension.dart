@@ -6,26 +6,27 @@ import 'package:xml/xml.dart';
 
 import 'converter.dart';
 
-final i8Codec = new SimpleCodec<int>(
+final i8Codec = SimpleCodec<int>(
   nodeLocalName: 'i8',
   encodeValue: (value) => value.toString(),
   decodeValue: int.parse,
 );
 
-final nilCodec = new _NilCodec();
+final nilCodec = _NilCodec();
 
 class _NilCodec implements Codec<Null> {
   @override
   XmlNode encode(value, XmlNode Function(dynamic) encode) {
-    if (value != null) throw new ArgumentError();
+    if (value != null) throw ArgumentError();
 
-    return new XmlElement(new XmlName('nil'));
+    return XmlElement(XmlName('nil'));
   }
 
   @override
   Null decode(XmlNode node, Function(XmlNode) decode) {
-    if (!(node is XmlElement && node.name.local == 'nil'))
-      throw new ArgumentError();
+    if (!(node is XmlElement && node.name.local == 'nil')) {
+      throw ArgumentError();
+    }
 
     return null;
   }

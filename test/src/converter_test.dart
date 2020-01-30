@@ -89,7 +89,7 @@ void main() {
     });
 
     test('decode simple text', () {
-      final elt = new XmlDocument([new XmlText('abcde')]).firstChild;
+      final elt = XmlDocument([XmlText('abcde')]).firstChild;
       expect(stringCodec.decode(elt, null), equals('abcde'));
     });
 
@@ -125,7 +125,7 @@ void main() {
     test('encode correctly', () {
       expect(
           dateTimeCodec
-              .encode(new DateTime.utc(2015, 1, 22, 8, 13, 42), null)
+              .encode(DateTime.utc(2015, 1, 22, 8, 13, 42), null)
               .toXmlString(),
           equals(
               '<dateTime.iso8601>2015-01-22T08:13:42.000Z</dateTime.iso8601>'));
@@ -136,14 +136,14 @@ void main() {
           parse('<dateTime.iso8601>2015-01-22T08:13:42.000Z</dateTime.iso8601>')
               .firstChild;
       expect(dateTimeCodec.decode(elt, null),
-          equals(new DateTime.utc(2015, 1, 22, 8, 13, 42)));
+          equals(DateTime.utc(2015, 1, 22, 8, 13, 42)));
     });
     test('decode 19980717T14:08:55', () {
       final elt =
           parse('<dateTime.iso8601>19980717T14:08:55</dateTime.iso8601>')
               .firstChild;
       expect(dateTimeCodec.decode(elt, null),
-          equals(new DateTime(1998, 7, 17, 14, 8, 55)));
+          equals(DateTime(1998, 7, 17, 14, 8, 55)));
     });
 
     test('throws for <string>1</string>', () {
@@ -154,7 +154,7 @@ void main() {
 
   group('base64Codec', () {
     test('encode correctly', () {
-      expect(base64Codec.encode(new Base64Value([1, 2, 3]), null).toXmlString(),
+      expect(base64Codec.encode(Base64Value([1, 2, 3]), null).toXmlString(),
           equals('<base64>AQID</base64>'));
     });
 
@@ -323,7 +323,7 @@ void main() {
           parse('<dateTime.iso8601>19980717T14:08:55</dateTime.iso8601>')
               .firstChild;
       expect(decode(elt, standardCodecs),
-          equals(new DateTime(1998, 7, 17, 14, 8, 55)));
+          equals(DateTime(1998, 7, 17, 14, 8, 55)));
     });
 
     test('should accept <base64>', () {
@@ -369,14 +369,14 @@ void main() {
 
     test('should accept DateTime', () {
       expect(
-          encode(new DateTime(1998, 7, 17, 14, 8, 55), standardCodecs)
+          encode(DateTime(1998, 7, 17, 14, 8, 55), standardCodecs)
               .toXmlString(),
           equals(
               '<dateTime.iso8601>1998-07-17T14:08:55.000</dateTime.iso8601>'));
     });
 
     test('should accept Base64Value', () {
-      expect(encode(new Base64Value([1, 2, 3]), standardCodecs).toXmlString(),
+      expect(encode(Base64Value([1, 2, 3]), standardCodecs).toXmlString(),
           equals('<base64>AQID</base64>'));
     });
 
@@ -396,7 +396,7 @@ void main() {
     });
 
     test('throws on Object', () {
-      expect(() => encode(new Object(), standardCodecs), throwsArgumentError);
+      expect(() => encode(Object(), standardCodecs), throwsArgumentError);
     });
   });
 }

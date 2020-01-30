@@ -27,10 +27,11 @@ import 'src/converter_extension.dart';
 
 export 'client.dart' hide call;
 
-final _codecs = new List<Codec>.unmodifiable(<Codec>[]
-  ..addAll(standardCodecs)
-  ..add(i8Codec)
-  ..add(nilCodec));
+final _codecs = List<Codec>.unmodifiable(<Codec>[
+  ...standardCodecs,
+  i8Codec,
+  nilCodec,
+]);
 
 Future call(
   dynamic url,

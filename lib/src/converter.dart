@@ -7,7 +7,7 @@ import 'package:xml/xml.dart';
 
 import 'common.dart';
 
-final standardCodecs = new List<Codec>.unmodifiable(<Codec>[
+final standardCodecs = List<Codec>.unmodifiable(<Codec>[
   doubleCodec,
   intCodec,
   boolCodec,
@@ -36,61 +36,64 @@ class SimpleCodec<T> implements Codec<T> {
 
   @override
   XmlNode encode(value, XmlNode Function(dynamic) encode) {
-    if (value is! T) throw new ArgumentError();
+    if (value is! T) throw ArgumentError();
 
-    return new XmlElement(
-      new XmlName(nodeLocalName),
+    return XmlElement(
+      XmlName(nodeLocalName),
       [],
-      [new XmlText(encodeValue(value as T))],
+      [XmlText(encodeValue(value as T))],
     );
   }
 
   @override
   T decode(XmlNode node, dynamic Function(XmlNode) decode) {
-    if (!(node is XmlElement && node.name.local == nodeLocalName))
-      throw new ArgumentError();
+    if (!(node is XmlElement && node.name.local == nodeLocalName)) {
+      throw ArgumentError();
+    }
 
     return decodeValue(node.text);
   }
 }
 
-final intCodec = new _IntCodec();
+final intCodec = _IntCodec();
 
 class _IntCodec implements Codec<int> {
   @override
   XmlNode encode(value, XmlNode Function(dynamic) encode) {
-    if (!(value is int && value >= -2147483648 && value <= 2147483647))
-      throw new ArgumentError();
+    if (!(value is int && value >= -2147483648 && value <= 2147483647)) {
+      throw ArgumentError();
+    }
 
-    return new XmlElement(
-      new XmlName('int'),
+    return XmlElement(
+      XmlName('int'),
       [],
-      [new XmlText(value.toString())],
+      [XmlText(value.toString())],
     );
   }
 
   @override
   int decode(XmlNode node, Function(XmlNode) decode) {
-    if (!(node is XmlElement && ['int', 'i4'].contains(node.name.local)))
-      throw new ArgumentError();
+    if (!(node is XmlElement && ['int', 'i4'].contains(node.name.local))) {
+      throw ArgumentError();
+    }
 
     return int.parse(node.text);
   }
 }
 
-final boolCodec = new SimpleCodec<bool>(
+final boolCodec = SimpleCodec<bool>(
   nodeLocalName: 'boolean',
   encodeValue: (value) => value ? '1' : '0',
   decodeValue: (text) {
     if (text != '0' && text != '1') {
-      throw new StateError(
+      throw StateError(
           'The element <boolean> must contain 0 or 1. Not "$text"');
     }
     return text == '1';
   },
 );
 
-final stringCodec = new _StringCodec();
+final stringCodec = _StringCodec();
 
 class _StringCodec extends SimpleCodec<String> {
   _StringCodec()
@@ -104,52 +107,54 @@ class _StringCodec extends SimpleCodec<String> {
   String decode(XmlNode node, Function(XmlNode) decode) {
     if (!(node == null || // with empty String that leads to "<value />"
         node is XmlText ||
-        node is XmlElement && node.name.local == 'string'))
-      throw new ArgumentError();
+        node is XmlElement && node.name.local == 'string')) {
+      throw ArgumentError();
+    }
 
     return node == null ? '' : node.text;
   }
 }
 
-final doubleCodec = new SimpleCodec<double>(
+final doubleCodec = SimpleCodec<double>(
   nodeLocalName: 'double',
   encodeValue: (value) => value.toString(),
   decodeValue: double.parse,
 );
 
-final dateTimeCodec = new SimpleCodec<DateTime>(
+final dateTimeCodec = SimpleCodec<DateTime>(
   nodeLocalName: 'dateTime.iso8601',
   encodeValue: (value) => value.toIso8601String(),
   decodeValue: DateTime.parse,
 );
 
-final base64Codec = new SimpleCodec<Base64Value>(
+final base64Codec = SimpleCodec<Base64Value>(
   nodeLocalName: 'base64',
   encodeValue: (value) => value.base64String,
-  decodeValue: (text) => new Base64Value.fromBase64String(text),
+  decodeValue: (text) => Base64Value.fromBase64String(text),
 );
 
-final structCodec = new _StructCodec();
+final structCodec = _StructCodec();
 
 class _StructCodec implements Codec<Map<String, dynamic>> {
   @override
   XmlNode encode(value, XmlNode Function(dynamic) encode) {
-    if (value is! Map<String, dynamic>) throw new ArgumentError();
+    if (value is! Map<String, dynamic>) throw ArgumentError();
 
     final members = <XmlNode>[];
     (value as Map<String, dynamic>).forEach((k, v) {
-      members.add(new XmlElement(new XmlName('member'), [], [
-        new XmlElement(new XmlName('name'), [], [new XmlText(k)]),
-        new XmlElement(new XmlName('value'), [], [encode(v)])
+      members.add(XmlElement(XmlName('member'), [], [
+        XmlElement(XmlName('name'), [], [XmlText(k)]),
+        XmlElement(XmlName('value'), [], [encode(v)])
       ]));
     });
-    return new XmlElement(new XmlName('struct'), [], members);
+    return XmlElement(XmlName('struct'), [], members);
   }
 
   @override
   Map<String, dynamic> decode(XmlNode node, Function(XmlNode) decode) {
-    if (!(node is XmlElement && node.name.local == 'struct'))
-      throw new ArgumentError();
+    if (!(node is XmlElement && node.name.local == 'struct')) {
+      throw ArgumentError();
+    }
 
     final struct = <String, dynamic>{};
     for (final member in (node as XmlElement).findElements('member')) {
@@ -162,25 +167,26 @@ class _StructCodec implements Codec<Map<String, dynamic>> {
   }
 }
 
-final arrayCodec = new _ArrayCodec();
+final arrayCodec = _ArrayCodec();
 
 class _ArrayCodec implements Codec<List> {
   @override
   XmlNode encode(value, XmlNode Function(dynamic) encode) {
-    if (value is! List) throw new ArgumentError();
+    if (value is! List) throw ArgumentError();
 
     final values = <XmlNode>[];
     value.forEach((e) {
-      values.add(new XmlElement(new XmlName('value'), [], [encode(e)]));
+      values.add(XmlElement(XmlName('value'), [], [encode(e)]));
     });
-    final data = new XmlElement(new XmlName('data'), [], values);
-    return new XmlElement(new XmlName('array'), [], [data]);
+    final data = XmlElement(XmlName('data'), [], values);
+    return XmlElement(XmlName('array'), [], [data]);
   }
 
   @override
   List decode(XmlNode node, Function(XmlNode) decode) {
-    if (!(node is XmlElement && node.name.local == 'array'))
-      throw new ArgumentError();
+    if (!(node is XmlElement && node.name.local == 'array')) {
+      throw ArgumentError();
+    }
 
     return (node as XmlElement)
         .findElements('data')
@@ -203,7 +209,7 @@ XmlNode encode(value, List<Codec> codecs) {
       // this codec don't support this value
     }
   }
-  throw new ArgumentError('No encoder to encode the value');
+  throw ArgumentError('No encoder to encode the value');
 }
 
 dynamic decode(XmlNode node, List<Codec> codecs) {
@@ -214,5 +220,5 @@ dynamic decode(XmlNode node, List<Codec> codecs) {
       // this codec don't support this xml node
     }
   }
-  throw new ArgumentError('No decoder to decode the value');
+  throw ArgumentError('No decoder to decode the value');
 }

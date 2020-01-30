@@ -31,39 +31,47 @@ Future call(
 
   final xml = convertMethodCall(methodName, params, encodeCodecs).toXmlString();
 
-  final _headers = <String, String>{'Content-Type': 'text/xml'};
-  if (headers != null) _headers.addAll(headers);
+  final _headers = <String, String>{
+    'Content-Type': 'text/xml',
+    if (headers != null) ...headers,
+  };
 
   final post = client != null ? client.post : http.post;
   final response =
       await post(url, headers: _headers, body: xml, encoding: encoding);
-  if (response.statusCode != 200) return new Future.error(response);
+  if (response.statusCode != 200) throw response;
   final body = response.body;
   final value = decodeResponse(parse(body), decodeCodecs);
   if (value is Fault) {
-    return new Future.error(value);
+    throw value;
   } else {
-    return new Future.value(value);
+    return value;
   }
 }
 
 XmlDocument convertMethodCall(
     String methodName, List params, List<Codec> encodeCodecs) {
   final methodCallChildren = [
-    new XmlElement(new XmlName('methodName'), [], [new XmlText(methodName)])
-  ];
-  if (params != null && params.isNotEmpty) {
-    methodCallChildren.add(new XmlElement(
-        new XmlName('params'),
+    XmlElement(XmlName('methodName'), [], [XmlText(methodName)]),
+    if (params != null && params.isNotEmpty)
+      XmlElement(
+        XmlName('params'),
         [],
-        params.map((p) => new XmlElement(new XmlName('param'), [], [
-              new XmlElement(
-                  new XmlName('value'), [], [encode(p, encodeCodecs)])
-            ]))));
-  }
-  return new XmlDocument([
-    new XmlProcessing('xml', 'version="1.0"'),
-    new XmlElement(new XmlName('methodCall'), [], methodCallChildren)
+        params.map(
+          (p) => XmlElement(
+            XmlName('param'),
+            [],
+            [
+              XmlElement(XmlName('value'), [], [encode(p, encodeCodecs)]),
+            ],
+          ),
+        ),
+      ),
+  ];
+
+  return XmlDocument([
+    XmlProcessing('xml', 'version="1.0"'),
+    XmlElement(XmlName('methodCall'), [], methodCallChildren)
   ]);
 }
 
@@ -97,6 +105,6 @@ dynamic decodeResponse(XmlDocument document, List<Codec> decodeCodecs) {
         faultString = value as String;
       }
     }
-    return new Fault(faultCode, faultString);
+    return Fault(faultCode, faultString);
   }
 }

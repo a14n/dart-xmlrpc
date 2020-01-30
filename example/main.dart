@@ -3,12 +3,18 @@
 // LICENSE file.
 import 'package:xml_rpc/client.dart' as xml_rpc;
 
-void main() {
+void main() async {
   const url = 'https://api.flickr.com/services/xmlrpc';
-  xml_rpc
-      .call(url, 'flickr.panda.getList', [
+  try {
+    var result = await xml_rpc.call(
+      url,
+      'flickr.panda.getList',
+      [
         {'api_key': 'yourApiKey'}
-      ])
-      .then(print)
-      .catchError(print);
+      ],
+    );
+    print(result);
+  } catch (e) {
+    print(e);
+  }
 }
