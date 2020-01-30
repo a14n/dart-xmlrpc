@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.4 (2020-01-30)
+
+- Improve pub score.
+
 ## 0.2.3 (2020-01-27)
 
 - Bump some dependencies.

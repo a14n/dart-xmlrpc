@@ -1,6 +1,8 @@
 name: xml_rpc
-version: 0.2.3
-description: A library to communicate through the XML-RPC protocol.
+version: 0.2.4
+description: >
+  A library implementing the XML-RPC protocol.
+  It provides a client allowing to make calls to servers.
 homepage: https://github.com/a14n/dart-xmlrpc
 environment:
   sdk: ">=2.2.2 <3.0.0"
