@@ -8,6 +8,7 @@ import 'package:test/test.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_rpc/src/common.dart';
 import 'package:xml_rpc/src/converter.dart';
+import 'package:xml_rpc/src/converter_extension.dart';
 
 void main() {
   group('intCodec', () {
@@ -167,6 +168,97 @@ void main() {
     test('throws for <string>1</string>', () {
       final elt = parse('<string>1</string>').firstChild;
       expect(() => base64Codec.decode(elt, null), throwsArgumentError);
+    });
+  });
+
+  group('faultCodec', () {
+    test('encode correctly', () {
+      expect(
+          faultCodec
+              .encode(Fault(1, 'This is a bad fault'),
+                  (n) => encode(n, standardCodecs))
+              .toXmlString(pretty: true),
+          equals('''
+<struct>
+  <member>
+    <name>faultCode</name>
+    <value>
+      <int>1</int>
+    </value>
+  </member>
+  <member>
+    <name>faultString</name>
+    <value>
+      <string>This is a bad fault</string>
+    </value>
+  </member>
+</struct>'''));
+    });
+
+    test('encode empty fault correctly with nil codec', () {
+      expect(
+          faultCodec
+              .encode(Fault(null, null),
+                  (n) => encode(n, [...standardCodecs, nilCodec]))
+              .toXmlString(pretty: true),
+          equals('''
+<struct>
+  <member>
+    <name>faultCode</name>
+    <value>
+      <nil/>
+    </value>
+  </member>
+  <member>
+    <name>faultString</name>
+    <value>
+      <nil/>
+    </value>
+  </member>
+</struct>'''));
+    });
+
+    test('decode fault', () {
+      final elt = parse('''
+<struct>
+  <member>
+    <name>faultCode</name>
+    <value>
+      <int>1</int>
+    </value>
+  </member>
+  <member>
+    <name>faultString</name>
+    <value>
+      <string>c</string>
+    </value>
+  </member>
+</struct>''').firstChild;
+      expect(faultCodec.decode(elt, (n) => decode(n, standardCodecs)),
+          equals(Fault(1, 'c')));
+    });
+
+    test('decode fault with empty string value', () {
+      final elt = parse('''
+<struct>
+  <member>
+    <name>faultCode</name>
+    <value>
+      <int>1</int>
+    </value>
+  </member>
+  <member>
+    <name>faultString</name>
+    <value />
+  </member>
+</struct>''').firstChild;
+      expect(faultCodec.decode(elt, (n) => decode(n, standardCodecs)),
+          equals(Fault(1, '')));
+    });
+
+    test('throws for <string>1</string>', () {
+      final elt = parse('<string>1</string>').firstChild;
+      expect(() => structCodec.decode(elt, null), throwsArgumentError);
     });
   });
 

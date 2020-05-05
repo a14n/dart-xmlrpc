@@ -16,6 +16,13 @@ class Fault {
 
   @override
   String toString() => 'Fault[code:$code,text:$text]';
+
+  @override
+  bool operator ==(Object other) =>
+      other is Fault && code == other.code && text == other.text;
+
+  @override
+  int get hashCode => (23 * 37 + code.hashCode) * 37 + text.hashCode;
 }
 
 /// A container for a base64 encoded value.
