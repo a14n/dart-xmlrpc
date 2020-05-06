@@ -17,3 +17,4 @@
 ///     }
 
 export 'src/server.dart';
+export 'src/simple_server.dart';
