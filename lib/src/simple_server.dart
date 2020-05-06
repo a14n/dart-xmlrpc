@@ -6,10 +6,12 @@ import 'package:xml/xml.dart';
 
 import '../server.dart';
 
+/// A [XmlRpcServer] that handles the XMLRPC server protocol with a single threaded [HttpServer]
 class SimpleXmlRpcServer extends XmlRpcServer {
   /// The [HttpServer] used for handling responses
   HttpServer _httpServer;
 
+  /// Creates a [SimpleXmlRpcServer]
   SimpleXmlRpcServer({
     @required String host,
     @required int port,
@@ -29,7 +31,9 @@ class SimpleXmlRpcServer extends XmlRpcServer {
   }
 }
 
-/// A [XmlRpcServer] that handles the XMLRPC server protocol with a single threaded [HttpServer]
+/// A [XmlRpcServer] that handles the XMLRPC server protocol
+///
+/// Subclasses must provide a http server to bind to the host / port and listen for incoming requests
 abstract class XmlRpcServer {
   static final rpcPaths = ['/', '/RPC2'];
 
