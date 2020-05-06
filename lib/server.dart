@@ -51,8 +51,8 @@ class XmlRpcHandler {
 
   Fault defaultMethodFailureHandler(
           String method, List<dynamic> params, dynamic error) =>
-      Fault(
-          methodFailureCode, 'Dispatching $method, with params $params failed');
+      Fault(methodFailureCode,
+          'Dispatching $method, with params $params failed with error $error');
 
   /// Marshalls the [data] from XML to Dart types, and then dispatches the function, and marshals the return value back into the XMLRPC format
   Future<XmlDocument> handle(XmlDocument document) async {
