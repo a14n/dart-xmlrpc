@@ -4,7 +4,8 @@ import 'dart:io';
 import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
 
-import '../server.dart';
+import 'server.dart';
+export 'server.dart';
 
 /// A [XmlRpcServer] that handles the XMLRPC server protocol with a single threaded [HttpServer]
 class SimpleXmlRpcServer extends XmlRpcServer {
@@ -15,19 +16,23 @@ class SimpleXmlRpcServer extends XmlRpcServer {
   SimpleXmlRpcServer({
     @required String host,
     @required int port,
-    @required XmlRpcHandler requestHandler,
+    @required XmlRpcHandler handler,
     Encoding encoding = utf8,
-  }) : super(
-            host: host,
-            port: port,
-            requestHandler: requestHandler,
-            encoding: encoding);
+  }) : super(host: host, port: port, handler: handler, encoding: encoding);
 
   /// Starts up the [_httpServer] and starts listening to requests
   @override
-  Future<void> serveForever() async {
+  Future<void> start() async {
     _httpServer = await HttpServer.bind(host, port);
     _httpServer.listen((req) => _acceptRequest(req, encoding));
+  }
+
+  /// Stops the [_httpServer]
+  ///
+  /// [force] determines whether to stop the [HttpServer] immediately even if there are open connections
+  @override
+  Future<void> stop({bool force = false}) async {
+    await _httpServer.close(force: force);
   }
 }
 
@@ -47,7 +52,7 @@ abstract class XmlRpcServer {
   final Encoding encoding;
 
   /// The [XmlRpcHandler] used for method lookup and handling
-  final XmlRpcHandler requestHandler;
+  final XmlRpcHandler handler;
 
   /// Creates a [XmlRpcServer] that will bind to the specified [host] and [port]
   ///
@@ -58,12 +63,17 @@ abstract class XmlRpcServer {
   XmlRpcServer({
     @required this.host,
     @required this.port,
-    @required this.requestHandler,
+    @required this.handler,
     this.encoding = utf8,
   });
 
   /// Starts up the [XmlRpcServer] and starts listening to requests
-  Future<void> serveForever();
+  Future<void> start();
+
+  /// Stops the [XmlRpcServer]
+  ///
+  /// [force] determines whether to stop the [XmlRpcServer] immediately even if there are open connections
+  Future<void> stop({bool force = false});
 
   /// Accepts a HTTP [request]
   ///
@@ -79,7 +89,7 @@ abstract class XmlRpcServer {
         if (result == null) {
           return;
         } else {
-          final response = requestHandler.handle(parse(result)).toXmlString();
+          final response = (await handler.handle(parse(result))).toXmlString();
           request.response.statusCode = 200;
           request.response.headers.contentType = ContentType.parse('text/xml');
           request.response.headers.contentLength = response.length;
@@ -127,7 +137,7 @@ abstract class XmlRpcServer {
 
 /// Sends a simple Http response to the [request] with the specified [code] and [messsage]
 void _sendResponse(HttpRequest request, int code, String message) {
-  request.response.statusCode = 404;
+  request.response.statusCode = code;
   request.response.headers.contentLength = message.length;
   request.response.headers.contentType = ContentType.text;
   request.response.write(message);

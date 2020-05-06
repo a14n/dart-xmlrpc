@@ -1,5 +1,5 @@
 import 'package:xml_rpc/client.dart' as client;
-import 'package:xml_rpc/server.dart' as server;
+import 'package:xml_rpc/simple_server.dart' as server;
 
 const port = 8080;
 const url = '127.0.0.1';
@@ -7,8 +7,8 @@ const url = '127.0.0.1';
 final clientURI = 'http://localhost:$port';
 void main() async {
   final s = server.SimpleXmlRpcServer(
-      host: url, port: port, requestHandler: MyXmlRpcHandler());
-  await s.serveForever();
+      host: url, port: port, handler: MyXmlRpcHandler());
+  await s.start();
   try {
     await callService();
     await callService();
@@ -20,6 +20,7 @@ void main() async {
   } catch (e) {
     print(e);
   }
+  await s.stop();
 }
 
 void callService() async {
