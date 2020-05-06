@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
+import 'package:xml_rpc/src/converter_extension.dart';
 
 import 'src/common.dart';
 import 'src/converter.dart';
@@ -16,31 +17,44 @@ class XmlRpcHandler {
   /// The function registry
   final Map<String, Function> methods;
 
+  final int methodFailureCode;
+  final int noExistingMethodCode;
+
   /// Creates a [XmlRpcHandler] with the set of [codecs] for encoding and decoding
-  XmlRpcHandler({@required this.methods, List<Codec> codecs})
-      : codecs = codecs ?? standardCodecs;
+  XmlRpcHandler({
+    @required this.methods,
+    List<Codec> codecs,
+    this.methodFailureCode,
+    this.noExistingMethodCode,
+  }) : codecs = codecs ?? standardCodecs;
 
   /// Marshalls the [data] from XML to Dart types, and then dispatches the function, and marshals the return value back into the XMLRPC format
   Future<XmlDocument> handle(XmlDocument document) async {
     final methodCall = document.findElements('methodCall').first;
     final methodName = methodCall.findElements('methodName').first.text;
-    final params = methodCall.findElements('params');
-    final parsedArgs = params.isNotEmpty
-        ? params.first
-            .findElements('param')
-            .map((arg) => arg.findElements('value').first)
-            .map(getValueContent)
-            .map((e) => decode(e, codecs))
-            .toList()
-        : [];
+    var returnValue;
+    if (methods.containsKey(methodName)) {
+      final params = methodCall.findElements('params');
+      final parsedArgs = params.isNotEmpty
+          ? params.first
+              .findElements('param')
+              .map((arg) => arg.findElements('value').first)
+              .map(getValueContent)
+              .map((e) => decode(e, codecs))
+              .toList()
+          : [];
 
-    final returnValue = await _dispatch(methodName, parsedArgs);
+      returnValue = await _dispatch(methodName, parsedArgs);
+    } else {
+      returnValue = Fault(noExistingMethodCode,
+          'No method by the name $methodName, registered with this server');
+    }
     List<XmlElement> methodResponseChildren;
     if (returnValue is Fault) {
       methodResponseChildren = [
         XmlElement(XmlName('fault'), [], [
           XmlElement(XmlName('value'), [], [
-            encode(returnValue, [faultCodec, ...codecs])
+            encode(returnValue, [faultCodec, nilCodec, ...codecs])
           ])
         ])
       ];
@@ -64,14 +78,10 @@ class XmlRpcHandler {
   /// Functions registered overshadow the instance methods
   dynamic _dispatch(String method, List<dynamic> params) async {
     try {
-      if (methods[method] != null) {
-        return await Function.apply(methods[method], params);
-      } else {
-        return Fault(
-            2, 'No method by the name $method, registered with this server');
-      }
+      return await Function.apply(methods[method], params);
     } on Exception {
-      return Fault(1, 'Dispatching $method, with params $params failed');
+      return Fault(
+          methodFailureCode, 'Dispatching $method, with params $params failed');
     }
   }
 }

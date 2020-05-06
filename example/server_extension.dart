@@ -1,5 +1,6 @@
 import 'package:xml_rpc/client.dart' as client;
 import 'package:xml_rpc/simple_server.dart' as server;
+import 'package:xml_rpc/src/converter_extension.dart';
 
 const port = 8080;
 const url = '127.0.0.1';
@@ -15,7 +16,8 @@ void main() async {
     callService();
     callService();
     await Future.delayed(Duration(milliseconds: 10));
-    final response = await client.call(clientURI, 'nonExistantMethod', []);
+    final response = await client.call(clientURI, 'nonExistantMethod', [],
+        decodeCodecs: [...client.standardCodecs, nilCodec]);
     print(response);
   } catch (e) {
     print(e);
