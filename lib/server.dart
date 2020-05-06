@@ -6,6 +6,13 @@ import 'package:xml_rpc/src/converter_extension.dart';
 import 'src/common.dart';
 import 'src/converter.dart';
 
+/// A [MethodFailureSignature] contains the name, parameters, and error from any exception or error during a function call
+///
+/// Name of the method being called
+/// Parameters that were passed in
+/// Exception or error that occurred
+typedef MethodFailureSignature = Fault Function(String, List<dynamic>, dynamic);
+
 /// A [XmlRpcHandler] handles the handling RPC functions along with marshalling the arguments and results to / from XMLRPC spec
 ///
 /// Has a set of [codecs] for encoding and decoding the datatypes
@@ -17,16 +24,35 @@ class XmlRpcHandler {
   /// The function registry
   final Map<String, Function> methods;
 
+  /// A function that gets called on a method failure with the following data
+  ///
+  /// Name of the method being called
+  /// Parameters that were passed in
+  /// Exception or error that occurred
+  MethodFailureSignature methodFailureHandler;
+
+  /// The error code for a method failure
   final int methodFailureCode;
+
+  /// The error code for a missing method
   final int noExistingMethodCode;
 
   /// Creates a [XmlRpcHandler] with the set of [codecs] for encoding and decoding
   XmlRpcHandler({
     @required this.methods,
     List<Codec> codecs,
+    MethodFailureSignature methodFailureHandler,
     this.methodFailureCode,
     this.noExistingMethodCode,
-  }) : codecs = codecs ?? standardCodecs;
+  }) : codecs = codecs ?? standardCodecs {
+    this.methodFailureHandler =
+        methodFailureHandler ?? defaultMethodFailureHandler;
+  }
+
+  Fault defaultMethodFailureHandler(
+          String method, List<dynamic> params, dynamic error) =>
+      Fault(
+          methodFailureCode, 'Dispatching $method, with params $params failed');
 
   /// Marshalls the [data] from XML to Dart types, and then dispatches the function, and marshals the return value back into the XMLRPC format
   Future<XmlDocument> handle(XmlDocument document) async {
@@ -79,9 +105,8 @@ class XmlRpcHandler {
   dynamic _dispatch(String method, List<dynamic> params) async {
     try {
       return await Function.apply(methods[method], params);
-    } on Exception {
-      return Fault(
-          methodFailureCode, 'Dispatching $method, with params $params failed');
+    } catch (e) {
+      return methodFailureHandler(method, params, e);
     }
   }
 }
