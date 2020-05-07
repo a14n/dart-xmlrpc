@@ -49,6 +49,18 @@ void main() async {
   } catch (e) {
     print(e);
   }
+
+  try {
+    // Invalid encoding
+    await client.call(
+      clientURI,
+      'createClass',
+      [],
+      decodeCodecs: [...client.standardCodecs],
+    );
+  } catch (e) {
+    print(e);
+  }
   await s.stop();
 }
 
@@ -69,6 +81,7 @@ class MyXmlRpcHandler extends server.XmlRpcHandler {
 
   MyXmlRpcHandler() : super(methods: {}) {
     methods['hello'] = hello;
+    methods['createClass'] = createClass;
   }
 
   int hello(Map params) {
@@ -80,4 +93,14 @@ class MyXmlRpcHandler extends server.XmlRpcHandler {
     clientNum += 1;
     return clientNum;
   }
+
+  SomeClass createClass() {
+    return SomeClass(true);
+  }
+}
+
+class SomeClass {
+  final bool aBool;
+
+  SomeClass(this.aBool);
 }
