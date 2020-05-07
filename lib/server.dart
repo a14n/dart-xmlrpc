@@ -17,9 +17,10 @@ typedef MethodFailureSignature = Fault Function(String, List<dynamic>, dynamic);
 ///
 /// Has a set of [codecs] for encoding and decoding the datatypes
 /// To register a method or function with the dispatcher call [registerFunction] along with the function and name
+/// The default fault codes specified are from the spec [here](http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php)
 class XmlRpcHandler {
   /// The [codecs] used for encoding and decoding
-  List<Codec> codecs;
+  final List<Codec> codecs;
 
   /// The function registry
   final Map<String, Function> methods;
@@ -29,67 +30,96 @@ class XmlRpcHandler {
   /// Name of the method being called
   /// Parameters that were passed in
   /// Exception or error that occurred
-  MethodFailureSignature methodFailureHandler;
-
-  /// The error code for a method failure
-  final int methodFailureCode;
+  final MethodFailureSignature methodFailureHandler;
 
   /// The error code for a missing method
   final int noExistingMethodCode;
 
-  /// Creates a [XmlRpcHandler] with the set of [codecs] for encoding and decoding
+  /// The error code for malformed xml
+  final int malformedXmlCode;
+
+  /// The error code for unsupported encoding
+  final int unsupportedEncoding;
+
+  /// Creates a [XmlRpcHandler] that handles the set of [methods]
+  ///
+  /// It uses the specified set of [codecs] for encoding and decoding
+  /// The [methodErrorHandler] is a callback that handles any exception or error thrown from the methods
+  /// The code [noExistingMethodCode] is the fault code returned if the method is not found
   XmlRpcHandler({
     @required this.methods,
     List<Codec> codecs,
     MethodFailureSignature methodFailureHandler,
-    this.methodFailureCode,
-    this.noExistingMethodCode,
-  }) : codecs = codecs ?? standardCodecs {
-    this.methodFailureHandler =
-        methodFailureHandler ?? defaultMethodFailureHandler;
-  }
+    int noExistingMethodCode,
+    int malformedXmlCode,
+    int unsupportedEncoding,
+  })  : codecs = codecs ?? standardCodecs,
+        methodFailureHandler =
+            methodFailureHandler ?? _defaultMethodFailureHandler,
+        noExistingMethodCode = noExistingMethodCode ?? -32601,
+        malformedXmlCode = malformedXmlCode ?? -32700,
+        unsupportedEncoding = unsupportedEncoding ?? -32701;
 
-  Fault defaultMethodFailureHandler(
+  /// A default method error handling callback
+  ///
+  /// The default fault code specified here is from the spec [here](http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php)
+  static Fault _defaultMethodFailureHandler(
           String method, List<dynamic> params, dynamic error) =>
-      Fault(methodFailureCode,
-          'Dispatching $method, with params $params failed with error $error');
+      Fault(-32500,
+          'Server error. Calling $method, with params $params failed with error $error');
 
   /// Marshalls the [data] from XML to Dart types, and then dispatches the function, and marshals the return value back into the XMLRPC format
   Future<XmlDocument> handle(XmlDocument document) async {
-    final methodCall = document.findElements('methodCall').first;
-    final methodName = methodCall.findElements('methodName').first.text;
     var returnValue;
-    if (methods.containsKey(methodName)) {
-      final params = methodCall.findElements('params');
-      final parsedArgs = params.isNotEmpty
-          ? params.first
-              .findElements('param')
-              .map((arg) => arg.findElements('value').first)
-              .map(getValueContent)
-              .map((e) => decode(e, codecs))
-              .toList()
-          : [];
+    try {
+      final methodCall = document.findElements('methodCall').first;
+      final methodName = methodCall.findElements('methodName').first.text;
+      if (methods.containsKey(methodName)) {
+        final params = methodCall.findElements('params');
+        final parsedArgs = params.isNotEmpty
+            ? params.first
+                .findElements('param')
+                .map((arg) => arg.findElements('value').first)
+                .map(getValueContent)
+                .map((e) => decode(e, codecs))
+                .toList()
+            : [];
 
-      returnValue = await _dispatch(methodName, parsedArgs);
-    } else {
-      returnValue = Fault(noExistingMethodCode,
-          'No method by the name $methodName, registered with this server');
+        returnValue = await _dispatch(methodName, parsedArgs);
+      } else {
+        returnValue = Fault(noExistingMethodCode,
+            'Server error. No method by the name $methodName, registered with this server');
+      }
+    } on ArgumentError catch (e) {
+      returnValue = Fault(unsupportedEncoding,
+          'Parse error. Decoding arguments failed, got: ${document.toXmlString()}, error was $e');
+    } catch (e) {
+      returnValue = Fault(malformedXmlCode,
+          'Parse error. Not well Formed, got: ${document.toXmlString()}, error was $e');
     }
     List<XmlElement> methodResponseChildren;
+    if (returnValue is! Fault) {
+      try {
+        methodResponseChildren = [
+          XmlElement(XmlName('params'), [], [
+            XmlElement(XmlName('param'), [], [
+              XmlElement(XmlName('value'), [], [encode(returnValue, codecs)])
+            ]),
+          ])
+        ];
+      } on ArgumentError catch (e) {
+        returnValue = Fault(unsupportedEncoding,
+            'Server error. Encoding arguments failed, response was: $returnValue, error was $e');
+      }
+    }
+    // The reason this is not an else statement is because the encoding can fail
+    // if we aren't given a codec to encode the return value
     if (returnValue is Fault) {
       methodResponseChildren = [
         XmlElement(XmlName('fault'), [], [
           XmlElement(XmlName('value'), [], [
             encode(returnValue, [faultCodec, nilCodec, ...codecs])
           ])
-        ])
-      ];
-    } else {
-      methodResponseChildren = [
-        XmlElement(XmlName('params'), [], [
-          XmlElement(XmlName('param'), [], [
-            XmlElement(XmlName('value'), [], [encode(returnValue, codecs)])
-          ]),
         ])
       ];
     }
