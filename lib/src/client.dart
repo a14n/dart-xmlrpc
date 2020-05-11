@@ -7,13 +7,21 @@ library xml_rpc.src.client;
 import 'dart:async';
 import 'dart:convert' show Encoding, utf8;
 
-import 'package:http/http.dart' as http show post, Client;
+import 'package:http/http.dart' as http show post, Client, Response;
 import 'package:xml/xml.dart';
 
 import 'common.dart';
 import 'converter.dart';
 
 export 'common.dart';
+
+/// The function to make http post.
+typedef HttpPost = Future<http.Response> Function(
+  dynamic url, {
+  Map<String, String> headers,
+  dynamic body,
+  Encoding encoding,
+});
 
 /// Make a xmlrpc call to the given [url], which can be a [Uri] or a [String].
 Future call(
@@ -22,7 +30,8 @@ Future call(
   List params, {
   Map<String, String> headers,
   Encoding encoding = utf8,
-  http.Client client,
+  @Deprecated('Use httpPost parameter with client.post') http.Client client,
+  HttpPost httpPost,
   List<Codec> encodeCodecs,
   List<Codec> decodeCodecs,
 }) async {
@@ -36,7 +45,7 @@ Future call(
     if (headers != null) ...headers,
   };
 
-  final post = client != null ? client.post : http.post;
+  final post = httpPost ?? (client != null ? client.post : http.post);
   final response =
       await post(url, headers: _headers, body: xml, encoding: encoding);
   if (response.statusCode != 200) throw response;

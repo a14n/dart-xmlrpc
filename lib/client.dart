@@ -16,5 +16,5 @@
 ///           .catchError((error) => print(error));
 ///     }
 
-export 'src/client.dart' show call, Fault, Base64Value;
+export 'src/client.dart' show call, Fault, Base64Value, HttpPost;
 export 'src/converter.dart' hide getValueContent, encode, decode;

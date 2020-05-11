@@ -21,7 +21,7 @@ import 'dart:convert' show Encoding, utf8;
 
 import 'package:http/http.dart' as http show Client;
 
-import 'client.dart' as xml_rpc show call;
+import 'client.dart' as xml_rpc show call, HttpPost;
 import 'src/converter.dart';
 import 'src/converter_extension.dart';
 
@@ -39,7 +39,8 @@ Future call(
   List params, {
   Map<String, String> headers,
   Encoding encoding = utf8,
-  http.Client client,
+  @Deprecated('Use httpPost parameter with client.post') http.Client client,
+  xml_rpc.HttpPost httpPost,
 }) =>
     xml_rpc.call(
       url,
@@ -47,7 +48,8 @@ Future call(
       params,
       headers: headers,
       encoding: encoding,
-      client: client,
+      client: client, // ignore: deprecated_member_use_from_same_package
+      httpPost: httpPost,
       encodeCodecs: _codecs,
       decodeCodecs: _codecs,
     );
