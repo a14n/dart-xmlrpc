@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 (2020-05-11)
+
+- Add server support
+- Deprecate `client` param of `call` method to replace it with a `httpPost`
+parameter. As only `client.post` is used it's easier to provide a custom http
+handler.
+
 ## 0.2.4 (2020-01-30)
 
 - Improve pub score.
