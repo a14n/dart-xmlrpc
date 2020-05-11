@@ -5,6 +5,8 @@ import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
 
 import 'server.dart';
+import 'src/common.dart';
+
 export 'server.dart';
 
 /// A [XmlRpcServer] that handles the XMLRPC server protocol with a single threaded [HttpServer]
@@ -24,7 +26,7 @@ class SimpleXmlRpcServer extends XmlRpcServer {
   @override
   Future<void> start() async {
     _httpServer = await HttpServer.bind(host, port);
-    _httpServer.listen((req) => _acceptRequest(req, encoding));
+    _httpServer.listen((req) => acceptRequest(req, encoding));
   }
 
   /// Stops the [_httpServer]
@@ -36,9 +38,11 @@ class SimpleXmlRpcServer extends XmlRpcServer {
   }
 }
 
-/// A [XmlRpcServer] that handles the XMLRPC server protocol
+/// A [XmlRpcServer] that handles the XMLRPC server protocol.
 ///
-/// Subclasses must provide a http server to bind to the host / port and listen for incoming requests
+/// Subclasses must provide a http server to bind to the host / port and listen for incoming requests.
+///
+/// The fault codes specified are from the spec [here](http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php)
 abstract class XmlRpcServer {
   static final rpcPaths = ['/', '/RPC2'];
 
@@ -79,67 +83,64 @@ abstract class XmlRpcServer {
   ///
   /// This method decodes the request with the encoding specified in the content-encoding header, or else the given [encoding]
   /// Then it handles the request using the [dispatcher], and responds with the appropriate response
-  void _acceptRequest(HttpRequest request, Encoding encoding) async {
-    if (request.method == 'POST') {
-      if (!_isRPCPathValid(request)) {
-        return _report404(request);
-      }
-      try {
-        final result = await _decodeRequestContent(request, encoding);
-        if (result == null) {
-          return;
-        } else {
-          final response = (await handler.handle(parse(result))).toXmlString();
-          request.response.statusCode = 200;
-          request.response.headers.contentType = ContentType.parse('text/xml');
-          request.response.headers.contentLength = response.length;
-          request.response.write(response);
-          await request.response.close();
-        }
-      } on Exception catch (e) {
-        print('Exception $e');
-        throw Exception();
-      }
-    } else {
-      return _report404(request);
+  @protected
+  void acceptRequest(HttpRequest request, Encoding encoding) async {
+    final httpResponse = request.response;
+    if (request.method != 'POST' || !_isRPCPathValid(request)) {
+      _report404(httpResponse);
+      return;
+    }
+    try {
+      final xmlRpcRequest = await encoding.decodeStream(request);
+      final response = await handler.handle(parse(xmlRpcRequest));
+      await _sendResponse(httpResponse, response);
+    } on XmlRpcRequestFormatException {
+      await _sendResponse(httpResponse,
+          handler.handleFault(Fault(-32602, 'invalid method parameters')));
+    } on XmlRpcMethodNotFoundException {
+      await _sendResponse(httpResponse,
+          handler.handleFault(Fault(-32601, 'requested method not found')));
+    } on XmlRpcCallException catch (e) {
+      await _sendResponse(
+          httpResponse,
+          handler.handleFault(
+              Fault(-32603, 'internal xml-rpc error : ${e.cause}')));
+    } on XmlRpcResponseEncodingException {
+      await _sendResponse(httpResponse,
+          handler.handleFault(Fault(-32603, 'unsupported response')));
+    } on Exception catch (e) {
+      print('Exception $e');
+      rethrow;
     }
   }
 
-  /// Reports a 404 error to the [request]
-  void _report404(HttpRequest request) {
-    _sendResponse(request, 404, 'No such page');
+  /// Reports a 404 error to the [httpResponse]
+  void _report404(HttpResponse httpResponse) {
+    _sendError(httpResponse, 404, 'No such page');
   }
 
   /// Checks to make sure that the [request]'s path is meant for the RPC handler
   bool _isRPCPathValid(HttpRequest request) {
     return rpcPaths.contains(request.requestedUri.path);
   }
-
-  /// Decodes the [request] with the encoding specified in the [request]'s content-encoding header or else the given [encoding]
-  Future<String> _decodeRequestContent(
-      HttpRequest request, Encoding encoding) async {
-    final headerEncoding = request.headers.value('content-encoding');
-    if (headerEncoding == null) {
-      return await encoding.decoder.bind(request).join('');
-    } else if (headerEncoding == 'gzip') {
-      try {
-        return await gzip.decoder.bind(request).join('');
-      } catch (e) {
-        _sendResponse(request, 400, 'Error decoding gzip content');
-        return null;
-      }
-    } else {
-      _sendResponse(request, 501, 'Encoding $headerEncoding not supported');
-      return null;
-    }
-  }
 }
 
-/// Sends a simple Http response to the [request] with the specified [code] and [messsage]
-void _sendResponse(HttpRequest request, int code, String message) {
-  request.response.statusCode = code;
-  request.response.headers.contentLength = message.length;
-  request.response.headers.contentType = ContentType.text;
-  request.response.write(message);
-  request.response.close();
+/// Sends an Http error to the [httpResponse] with the specified [code] and [messsage]
+Future<void> _sendError(HttpResponse httpResponse, int code, String message) =>
+    (httpResponse
+          ..statusCode = code
+          ..headers.contentLength = message.length
+          ..headers.contentType = ContentType.text
+          ..write(message))
+        .close();
+
+/// Sends a xmlrpc message to [httpResponse] with the specified [xml].
+Future<void> _sendResponse(HttpResponse httpResponse, XmlDocument xml) {
+  final text = xml.toXmlString();
+  return (httpResponse
+        ..statusCode = 200
+        ..headers.contentLength = text.length
+        ..headers.contentType = ContentType.parse('text/xml')
+        ..write(text))
+      .close();
 }
