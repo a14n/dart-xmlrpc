@@ -133,6 +133,50 @@ final base64Codec = SimpleCodec<Base64Value>(
   decodeValue: (text) => Base64Value.fromBase64String(text),
 );
 
+final faultCodec = _FaultCodec();
+
+class _FaultCodec implements Codec<Fault> {
+  @override
+  XmlNode encode(value, XmlNode Function(dynamic) encode) {
+    if (value is! Fault) throw ArgumentError();
+
+    final members = <XmlNode>[];
+    final fault = value as Fault;
+    final faultMap = <String, dynamic>{
+      'faultCode': fault.code,
+      'faultString': fault.text
+    };
+    faultMap.forEach((k, v) {
+      members.add(XmlElement(XmlName('member'), [], [
+        XmlElement(XmlName('name'), [], [XmlText(k)]),
+        XmlElement(XmlName('value'), [], [encode(v)])
+      ]));
+    });
+    return XmlElement(XmlName('struct'), [], members);
+  }
+
+  @override
+  Fault decode(XmlNode node, Function(XmlNode) decode) {
+    if (!(node is XmlElement && node.name.local == 'struct')) {
+      throw ArgumentError();
+    }
+    final struct = <String, dynamic>{};
+    for (final member in (node as XmlElement).findElements('member')) {
+      final name = member.findElements('name').first.text;
+      final valueElt = member.findElements('value').first;
+      final elt = getValueContent(valueElt);
+      struct[name] = decode(elt);
+    }
+    if (!struct.containsKey('faultCode') ||
+        struct['faultCode'] is! int ||
+        !struct.containsKey('faultString') ||
+        struct['faultString'] is! String) {
+      throw StateError('$struct is not a properly encoded Fault');
+    }
+    return Fault(struct['faultCode'] as int, struct['faultString'] as String);
+  }
+}
+
 final structCodec = _StructCodec();
 
 class _StructCodec implements Codec<Map<String, dynamic>> {
