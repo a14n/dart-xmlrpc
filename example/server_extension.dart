@@ -1,3 +1,4 @@
+import 'package:pedantic/pedantic.dart';
 import 'package:xml_rpc/client.dart' as client;
 import 'package:xml_rpc/simple_server.dart' as server;
 import 'package:xml_rpc/src/converter_extension.dart';
@@ -5,7 +6,7 @@ import 'package:xml_rpc/src/converter_extension.dart';
 const port = 8080;
 const url = '127.0.0.1';
 
-final clientURI = 'http://localhost:$port';
+final clientURI = Uri.parse('http://localhost:$port');
 void main() async {
   final s = server.SimpleXmlRpcServer(
       host: url, port: port, handler: MyXmlRpcHandler());
@@ -15,8 +16,8 @@ void main() async {
   await callService();
 
   // Asyncronous calls to the service
-  callService();
-  callService();
+  unawaited(callService());
+  unawaited(callService());
   await Future.delayed(Duration(milliseconds: 10));
 
   try {
@@ -64,7 +65,7 @@ void main() async {
   await s.stop();
 }
 
-void callService() async {
+Future<void> callService() async {
   print('calling service');
   var result = await client.call(
     clientURI,

@@ -17,23 +17,23 @@ export 'common.dart';
 
 /// The function to make http post.
 typedef HttpPost = Future<http.Response> Function(
-  dynamic url, {
-  Map<String, String> headers,
+  Uri url, {
+  Map<String, String>? headers,
   dynamic body,
-  Encoding encoding,
+  Encoding? encoding,
 });
 
 /// Make a xmlrpc call to the given [url], which can be a [Uri] or a [String].
 Future call(
-  dynamic url,
+  Uri url,
   String methodName,
   List params, {
-  Map<String, String> headers,
+  Map<String, String>? headers,
   Encoding encoding = utf8,
-  @Deprecated('Use httpPost parameter with client.post') http.Client client,
-  HttpPost httpPost,
-  List<Codec> encodeCodecs,
-  List<Codec> decodeCodecs,
+  @Deprecated('Use httpPost parameter with client.post') http.Client? client,
+  HttpPost? httpPost,
+  List<Codec>? encodeCodecs,
+  List<Codec>? decodeCodecs,
 }) async {
   encodeCodecs ??= standardCodecs;
   decodeCodecs ??= standardCodecs;
@@ -45,12 +45,12 @@ Future call(
     if (headers != null) ...headers,
   };
 
-  final post = httpPost ?? (client != null ? client.post : http.post);
+  final HttpPost post = httpPost ?? (client != null ? client.post : http.post);
   final response =
       await post(url, headers: _headers, body: xml, encoding: encoding);
   if (response.statusCode != 200) throw response;
   final body = response.body;
-  final value = decodeResponse(parse(body), decodeCodecs);
+  final value = decodeResponse(XmlDocument.parse(body), decodeCodecs);
   if (value is Fault) {
     throw value;
   } else {
@@ -62,7 +62,7 @@ XmlDocument convertMethodCall(
     String methodName, List params, List<Codec> encodeCodecs) {
   final methodCallChildren = [
     XmlElement(XmlName('methodName'), [], [XmlText(methodName)]),
-    if (params != null && params.isNotEmpty)
+    if (params.isNotEmpty)
       XmlElement(
         XmlName('params'),
         [],
@@ -93,8 +93,8 @@ dynamic decodeResponse(XmlDocument document, List<Codec> decodeCodecs) {
     final elt = getValueContent(valueElt);
     return decode(elt, decodeCodecs);
   } else {
-    int faultCode;
-    String faultString;
+    int? faultCode;
+    String? faultString;
     final members = responseElt
         .findElements('fault')
         .first

@@ -5,7 +5,7 @@
 library xml_rpc.src.client.test;
 
 import 'package:test/test.dart';
-import 'package:xml/xml.dart' show parse;
+import 'package:xml/xml.dart' show XmlDocument;
 import 'package:xml_rpc/src/client.dart';
 import 'package:xml_rpc/src/converter.dart';
 
@@ -65,7 +65,7 @@ void main() {
 
   group('decodeResponse', () {
     test('for simple response', () {
-      expect(decodeResponse(parse('''
+      expect(decodeResponse(XmlDocument.parse('''
 <?xml version="1.0"?>
 <methodResponse>
   <params>
@@ -77,7 +77,7 @@ void main() {
     });
 
     test('for fault', () {
-      var result = decodeResponse(parse('''
+      var result = decodeResponse(XmlDocument.parse('''
 <?xml version="1.0"?>
 <methodResponse>
   <fault>

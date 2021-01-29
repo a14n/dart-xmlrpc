@@ -34,13 +34,13 @@ final _codecs = List<Codec>.unmodifiable(<Codec>[
 ]);
 
 Future call(
-  dynamic url,
+  Uri url,
   String methodName,
   List params, {
-  Map<String, String> headers,
+  Map<String, String>? headers,
   Encoding encoding = utf8,
-  @Deprecated('Use httpPost parameter with client.post') http.Client client,
-  xml_rpc.HttpPost httpPost,
+  @Deprecated('Use httpPost parameter with client.post') http.Client? client,
+  xml_rpc.HttpPost? httpPost,
 }) =>
     xml_rpc.call(
       url,

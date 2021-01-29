@@ -5,11 +5,11 @@ description: >
   It provides a client allowing to make calls to servers.
 homepage: https://github.com/a14n/dart-xmlrpc
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+  sdk: '>=2.12.0-0 <3.0.0'
 dependencies:
-  http: ^0.12.1
-  meta: ^1.1.8
-  xml: ^4.1.0
+  http: ^0.13.0-nullsafety.0 
+  collection: ^1.15.0-nullsafety.5
+  xml: ^5.0.0-nullsafety.1
 dev_dependencies:
   test: ^1.14.3
   pedantic: ^1.9.0

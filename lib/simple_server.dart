@@ -12,13 +12,13 @@ export 'server.dart';
 /// A [XmlRpcServer] that handles the XMLRPC server protocol with a single threaded [HttpServer]
 class SimpleXmlRpcServer extends XmlRpcServer {
   /// The [HttpServer] used for handling responses
-  HttpServer _httpServer;
+  late HttpServer _httpServer;
 
   /// Creates a [SimpleXmlRpcServer]
   SimpleXmlRpcServer({
-    @required String host,
-    @required int port,
-    @required XmlRpcHandler handler,
+    required String host,
+    required int port,
+    required XmlRpcHandler handler,
     Encoding encoding = utf8,
   }) : super(host: host, port: port, handler: handler, encoding: encoding);
 
@@ -65,9 +65,9 @@ abstract class XmlRpcServer {
   /// You must await the call to [serverForever] to start up the server
   /// before making any client requests
   XmlRpcServer({
-    @required this.host,
-    @required this.port,
-    @required this.handler,
+    required this.host,
+    required this.port,
+    required this.handler,
     this.encoding = utf8,
   });
 
@@ -92,7 +92,7 @@ abstract class XmlRpcServer {
     }
     try {
       final xmlRpcRequest = await encoding.decodeStream(request);
-      final response = await handler.handle(parse(xmlRpcRequest));
+      final response = await handler.handle(XmlDocument.parse(xmlRpcRequest));
       await _sendResponse(httpResponse, response);
     } on XmlRpcRequestFormatException {
       await _sendResponse(httpResponse,

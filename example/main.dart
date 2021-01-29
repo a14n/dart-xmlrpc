@@ -4,7 +4,7 @@
 import 'package:xml_rpc/client.dart' as xml_rpc;
 
 void main() async {
-  const url = 'https://api.flickr.com/services/xmlrpc';
+  final url = Uri.parse('https://api.flickr.com/services/xmlrpc');
   try {
     var result = await xml_rpc.call(
       url,

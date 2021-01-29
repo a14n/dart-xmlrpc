@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
 
 import 'src/common.dart';
@@ -14,8 +13,8 @@ class XmlRpcHandler {
   ///
   /// It uses the specified set of [codecs] for encoding and decoding.
   XmlRpcHandler({
-    @required this.methods,
-    List<Codec> codecs,
+    required this.methods,
+    List<Codec>? codecs,
   }) : codecs = codecs ?? standardCodecs;
 
   /// The [codecs] used for encoding and decoding
@@ -27,7 +26,7 @@ class XmlRpcHandler {
   /// Marshalls the [data] from XML to Dart types, and then dispatches the function, and marshals the return value back into the XMLRPC format
   Future<XmlDocument> handle(XmlDocument document) async {
     String methodName;
-    final params = <Object>[];
+    final params = <Object?>[];
     try {
       final methodCall = document.findElements('methodCall').first;
       methodName = methodCall.findElements('methodName').first.text;
@@ -50,9 +49,9 @@ class XmlRpcHandler {
     }
 
     // execute call
-    Object result;
+    Object? result;
     try {
-      result = await Function.apply(methods[methodName], params);
+      result = await Function.apply(methods[methodName]!, params);
     } catch (e) {
       throw XmlRpcCallException(e);
     }
@@ -76,7 +75,7 @@ class XmlRpcHandler {
     ]);
   }
 
-  XmlDocument handleFault(Fault fault, {List<Codec> codecs}) => XmlDocument([
+  XmlDocument handleFault(Fault fault, {List<Codec>? codecs}) => XmlDocument([
         XmlProcessing('xml', 'version="1.0"'),
         XmlElement(XmlName('methodResponse'), [], [
           XmlElement(XmlName('fault'), [], [
@@ -92,11 +91,11 @@ abstract class XmlRpcException implements Exception {
   XmlRpcException([this.cause]);
 
   /// The cause thrown when the real method was called.
-  Object cause;
+  Object? cause;
 }
 
 class XmlRpcRequestFormatException extends XmlRpcException {
-  XmlRpcRequestFormatException([Object cause]) : super(cause);
+  XmlRpcRequestFormatException([Object? cause]) : super(cause);
 }
 
 /// When an exception occurs in the real method call
@@ -109,10 +108,10 @@ class XmlRpcMethodNotFoundException extends XmlRpcException {
 
 /// When an exception occurs in the real method call
 class XmlRpcCallException extends XmlRpcException {
-  XmlRpcCallException([Object cause]) : super(cause);
+  XmlRpcCallException([Object? cause]) : super(cause);
 }
 
 /// When an exception occurs in response encoding
 class XmlRpcResponseEncodingException extends XmlRpcException {
-  XmlRpcResponseEncodingException([Object cause]) : super(cause);
+  XmlRpcResponseEncodingException([Object? cause]) : super(cause);
 }

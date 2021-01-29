@@ -15,12 +15,12 @@ void main() {
     });
 
     test('decode <nil></nil>', () {
-      final elt = parse('<nil></nil>').firstChild;
+      final elt = XmlDocument.parse('<nil></nil>').firstChild;
       expect(nilCodec.decode(elt, null), equals(null));
     });
 
     test('decode <nil/>', () {
-      final elt = parse('<nil/>').firstChild;
+      final elt = XmlDocument.parse('<nil/>').firstChild;
       expect(nilCodec.decode(elt, null), equals(null));
     });
   });
@@ -42,12 +42,12 @@ void main() {
     });
 
     test('decode <i8>1</i8>', () {
-      final elt = parse('<i8>1</i8>').firstChild;
+      final elt = XmlDocument.parse('<i8>1</i8>').firstChild;
       expect(i8Codec.decode(elt, null), equals(1));
     });
 
     test('decode <i8>2147483648</i8>', () {
-      final elt = parse('<i8>2147483648</i8>').firstChild;
+      final elt = XmlDocument.parse('<i8>2147483648</i8>').firstChild;
       expect(i8Codec.decode(elt, null), equals(2147483648));
     });
   });
