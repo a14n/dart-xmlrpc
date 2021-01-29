@@ -1,5 +1,5 @@
 name: xml_rpc
-version: 0.3.0
+version: 0.4.0-nullsafety.0
 description: >
   A library implementing the XML-RPC protocol.
   It provides a client allowing to make calls to servers.

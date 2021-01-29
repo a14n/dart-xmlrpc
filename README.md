@@ -12,7 +12,7 @@ A simple usage example:
 import 'package:xml_rpc/client.dart' as xml_rpc;
 
 main() {
-  final url = '...';
+  final url = Uri.parse('...');
   xml_rpc
       .call(url, 'examples.getStateName', [41])
       .then((result) => print(result))
