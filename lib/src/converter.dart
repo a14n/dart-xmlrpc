@@ -143,10 +143,9 @@ class _FaultCodec implements Codec<Fault> {
     if (value is! Fault) throw ArgumentError();
 
     final members = <XmlNode>[];
-    final fault = value;
     final faultMap = <String, Object?>{
-      'faultCode': fault.code,
-      'faultString': fault.text
+      'faultCode': value.code,
+      'faultString': value.text
     };
     faultMap.forEach((k, v) {
       members.add(XmlElement(XmlName('member'), [], [
@@ -169,13 +168,12 @@ class _FaultCodec implements Codec<Fault> {
       final elt = getValueContent(valueElt);
       struct[name] = decode!(elt);
     }
-    if (!struct.containsKey('faultCode') ||
-        struct['faultCode'] is! int ||
-        !struct.containsKey('faultString') ||
-        struct['faultString'] is! String) {
+    final faultCode = struct['faultCode'];
+    final faultString = struct['faultString'];
+    if (faultCode is! int || faultString is! String) {
       throw StateError('$struct is not a properly encoded Fault');
     }
-    return Fault(struct['faultCode'] as int?, struct['faultString'] as String?);
+    return Fault(faultCode, faultString);
   }
 }
 

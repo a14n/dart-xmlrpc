@@ -7,10 +7,10 @@ import 'dart:convert' show base64;
 /// An object corresponding to a `<fault>` in the response.
 class Fault {
   /// The code contained in <faultCode>.
-  final int? code;
+  final int code;
 
   /// The text contained in <faultString>.
-  final String? text;
+  final String text;
 
   Fault(this.code, this.text);
 

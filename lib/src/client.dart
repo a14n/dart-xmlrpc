@@ -7,7 +7,7 @@ library xml_rpc.src.client;
 import 'dart:async';
 import 'dart:convert' show Encoding, utf8;
 
-import 'package:http/http.dart' as http show post, Client, Response;
+import 'package:http/http.dart' as http show post, Response;
 import 'package:xml/xml.dart';
 
 import 'common.dart';
@@ -19,7 +19,7 @@ export 'common.dart';
 typedef HttpPost = Future<http.Response> Function(
   Uri url, {
   Map<String, String>? headers,
-  dynamic body,
+  Object? body,
   Encoding? encoding,
 });
 
@@ -30,7 +30,6 @@ Future call(
   List params, {
   Map<String, String>? headers,
   Encoding encoding = utf8,
-  @Deprecated('Use httpPost parameter with client.post') http.Client? client,
   HttpPost? httpPost,
   List<Codec>? encodeCodecs,
   List<Codec>? decodeCodecs,
@@ -45,7 +44,7 @@ Future call(
     if (headers != null) ...headers,
   };
 
-  final HttpPost post = httpPost ?? (client != null ? client.post : http.post);
+  final post = httpPost ?? http.post;
   final response =
       await post(url, headers: _headers, body: xml, encoding: encoding);
   if (response.statusCode != 200) throw response;
@@ -93,8 +92,8 @@ dynamic decodeResponse(XmlDocument document, List<Codec> decodeCodecs) {
     final elt = getValueContent(valueElt);
     return decode(elt, decodeCodecs);
   } else {
-    int? faultCode;
-    String? faultString;
+    late int faultCode;
+    late String faultString;
     final members = responseElt
         .findElements('fault')
         .first

@@ -8,7 +8,6 @@ import 'package:test/test.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_rpc/src/common.dart';
 import 'package:xml_rpc/src/converter.dart';
-import 'package:xml_rpc/src/converter_extension.dart';
 
 void main() {
   group('intCodec', () {
@@ -190,29 +189,6 @@ void main() {
     <name>faultString</name>
     <value>
       <string>This is a bad fault</string>
-    </value>
-  </member>
-</struct>'''));
-    });
-
-    test('encode empty fault correctly with nil codec', () {
-      expect(
-          faultCodec
-              .encode(Fault(null, null),
-                  (n) => encode(n, [...standardCodecs, nilCodec]))
-              .toXmlString(pretty: true),
-          equals('''
-<struct>
-  <member>
-    <name>faultCode</name>
-    <value>
-      <nil/>
-    </value>
-  </member>
-  <member>
-    <name>faultString</name>
-    <value>
-      <nil/>
     </value>
   </member>
 </struct>'''));
