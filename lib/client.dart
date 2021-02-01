@@ -8,13 +8,14 @@
 /// You can make method calls with:
 ///
 ///     import 'package:xml_rpc/client.dart' as xml_rpc;
-///     main() {
-///       final url = '...';
-///       xml_rpc
-///           .call(url, 'examples.getStateName', [41])
-///           .then((result) => print(result))
-///           .catchError((error) => print(error));
+///     main() async {
+///       final url = Uri.parse('...');
+///       try {
+///         final result = await xml_rpc.call(url, 'examples.getStateName', [41]);
+///         print(result);
+///       } catch (error) {
+///         print(error);
+///       }
 ///     }
-
 export 'src/client.dart' show call, Fault, Base64Value, HttpPost;
 export 'src/converter.dart' hide getValueContent, encode, decode;

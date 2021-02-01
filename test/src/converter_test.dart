@@ -8,7 +8,6 @@ import 'package:test/test.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_rpc/src/common.dart';
 import 'package:xml_rpc/src/converter.dart';
-import 'package:xml_rpc/src/converter_extension.dart';
 
 void main() {
   group('intCodec', () {
@@ -26,17 +25,17 @@ void main() {
     });
 
     test('decode <int>1</int>', () {
-      final elt = parse('<int>1</int>').firstChild;
+      final elt = XmlDocument.parse('<int>1</int>').firstChild;
       expect(intCodec.decode(elt, null), equals(1));
     });
 
     test('decode <i4>1</i4>', () {
-      final elt = parse('<i4>1</i4>').firstChild;
+      final elt = XmlDocument.parse('<i4>1</i4>').firstChild;
       expect(intCodec.decode(elt, null), equals(1));
     });
 
     test('throws for <string>1</string>', () {
-      final elt = parse('<string>1</string>').firstChild;
+      final elt = XmlDocument.parse('<string>1</string>').firstChild;
       expect(() => intCodec.decode(elt, null), throwsArgumentError);
     });
   });
@@ -53,22 +52,22 @@ void main() {
     });
 
     test('decode <boolean>1</boolean>', () {
-      final elt = parse('<boolean>1</boolean>').firstChild;
+      final elt = XmlDocument.parse('<boolean>1</boolean>').firstChild;
       expect(boolCodec.decode(elt, null), equals(true));
     });
 
     test('decode <boolean>0</boolean>', () {
-      final elt = parse('<boolean>0</boolean>').firstChild;
+      final elt = XmlDocument.parse('<boolean>0</boolean>').firstChild;
       expect(boolCodec.decode(elt, null), equals(false));
     });
 
     test('throws for <boolean>a</boolean>', () {
-      final elt = parse('<boolean>a</boolean>').firstChild;
+      final elt = XmlDocument.parse('<boolean>a</boolean>').firstChild;
       expect(() => boolCodec.decode(elt, null), throwsStateError);
     });
 
     test('throws for <string>1</string>', () {
-      final elt = parse('<string>1</string>').firstChild;
+      final elt = XmlDocument.parse('<string>1</string>').firstChild;
       expect(() => boolCodec.decode(elt, null), throwsArgumentError);
     });
   });
@@ -80,12 +79,12 @@ void main() {
     });
 
     test('decode <string>a</string>', () {
-      final elt = parse('<string>a</string>').firstChild;
+      final elt = XmlDocument.parse('<string>a</string>').firstChild;
       expect(stringCodec.decode(elt, null), equals('a'));
     });
 
     test('decode <string>abcde</string>', () {
-      final elt = parse('<string>abcde</string>').firstChild;
+      final elt = XmlDocument.parse('<string>abcde</string>').firstChild;
       expect(stringCodec.decode(elt, null), equals('abcde'));
     });
 
@@ -95,7 +94,7 @@ void main() {
     });
 
     test('throws for <int>1</int>', () {
-      final elt = parse('<boolean>a</boolean>').firstChild;
+      final elt = XmlDocument.parse('<boolean>a</boolean>').firstChild;
       expect(() => stringCodec.decode(elt, null), throwsArgumentError);
     });
   });
@@ -107,17 +106,17 @@ void main() {
     });
 
     test('decode <double>1.234</double>', () {
-      final elt = parse('<double>1.234</double>').firstChild;
+      final elt = XmlDocument.parse('<double>1.234</double>').firstChild;
       expect(doubleCodec.decode(elt, null), equals(1.234));
     });
 
     test('decode <double>1</double>', () {
-      final elt = parse('<double>1</double>').firstChild;
+      final elt = XmlDocument.parse('<double>1</double>').firstChild;
       expect(doubleCodec.decode(elt, null), equals(1));
     });
 
     test('throws for <string>1</string>', () {
-      final elt = parse('<string>1</string>').firstChild;
+      final elt = XmlDocument.parse('<string>1</string>').firstChild;
       expect(() => doubleCodec.decode(elt, null), throwsArgumentError);
     });
   });
@@ -133,22 +132,22 @@ void main() {
     });
 
     test('decode 2015-01-22T08:13:42.000Z', () {
-      final elt =
-          parse('<dateTime.iso8601>2015-01-22T08:13:42.000Z</dateTime.iso8601>')
-              .firstChild;
+      final elt = XmlDocument.parse(
+              '<dateTime.iso8601>2015-01-22T08:13:42.000Z</dateTime.iso8601>')
+          .firstChild;
       expect(dateTimeCodec.decode(elt, null),
           equals(DateTime.utc(2015, 1, 22, 8, 13, 42)));
     });
     test('decode 19980717T14:08:55', () {
-      final elt =
-          parse('<dateTime.iso8601>19980717T14:08:55</dateTime.iso8601>')
-              .firstChild;
+      final elt = XmlDocument.parse(
+              '<dateTime.iso8601>19980717T14:08:55</dateTime.iso8601>')
+          .firstChild;
       expect(dateTimeCodec.decode(elt, null),
           equals(DateTime(1998, 7, 17, 14, 8, 55)));
     });
 
     test('throws for <string>1</string>', () {
-      final elt = parse('<string>1</string>').firstChild;
+      final elt = XmlDocument.parse('<string>1</string>').firstChild;
       expect(() => dateTimeCodec.decode(elt, null), throwsArgumentError);
     });
   });
@@ -160,13 +159,13 @@ void main() {
     });
 
     test('decode AQID', () {
-      final elt = parse('<base64>AQID</base64>').firstChild;
+      final elt = XmlDocument.parse('<base64>AQID</base64>').firstChild;
       expect(base64Codec.decode(elt, null).base64String, equals('AQID'));
       expect(base64Codec.decode(elt, null).bytes, equals([1, 2, 3]));
     });
 
     test('throws for <string>1</string>', () {
-      final elt = parse('<string>1</string>').firstChild;
+      final elt = XmlDocument.parse('<string>1</string>').firstChild;
       expect(() => base64Codec.decode(elt, null), throwsArgumentError);
     });
   });
@@ -195,31 +194,8 @@ void main() {
 </struct>'''));
     });
 
-    test('encode empty fault correctly with nil codec', () {
-      expect(
-          faultCodec
-              .encode(Fault(null, null),
-                  (n) => encode(n, [...standardCodecs, nilCodec]))
-              .toXmlString(pretty: true),
-          equals('''
-<struct>
-  <member>
-    <name>faultCode</name>
-    <value>
-      <nil/>
-    </value>
-  </member>
-  <member>
-    <name>faultString</name>
-    <value>
-      <nil/>
-    </value>
-  </member>
-</struct>'''));
-    });
-
     test('decode fault', () {
-      final elt = parse('''
+      final elt = XmlDocument.parse('''
 <struct>
   <member>
     <name>faultCode</name>
@@ -239,7 +215,7 @@ void main() {
     });
 
     test('decode fault with empty string value', () {
-      final elt = parse('''
+      final elt = XmlDocument.parse('''
 <struct>
   <member>
     <name>faultCode</name>
@@ -257,7 +233,7 @@ void main() {
     });
 
     test('throws for <string>1</string>', () {
-      final elt = parse('<string>1</string>').firstChild;
+      final elt = XmlDocument.parse('<string>1</string>').firstChild;
       expect(() => structCodec.decode(elt, null), throwsArgumentError);
     });
   });
@@ -290,7 +266,7 @@ void main() {
     });
 
     test('decode struct', () {
-      final elt = parse('''
+      final elt = XmlDocument.parse('''
 <struct>
   <member>
     <name>a</name>
@@ -310,12 +286,12 @@ void main() {
     });
 
     test('decode empty struct', () {
-      final elt = parse('<struct></struct>').firstChild;
+      final elt = XmlDocument.parse('<struct></struct>').firstChild;
       expect(structCodec.decode(elt, null), equals({}));
     });
 
     test('decode struct with empty string value', () {
-      final elt = parse('''
+      final elt = XmlDocument.parse('''
 <struct>
   <member>
     <name />
@@ -333,7 +309,7 @@ void main() {
     });
 
     test('throws for <string>1</string>', () {
-      final elt = parse('<string>1</string>').firstChild;
+      final elt = XmlDocument.parse('<string>1</string>').firstChild;
       expect(() => structCodec.decode(elt, null), throwsArgumentError);
     });
   });
@@ -363,7 +339,7 @@ void main() {
     });
 
     test('decode array', () {
-      final elt = parse('''
+      final elt = XmlDocument.parse('''
 <array>
   <data>
     <value>
@@ -379,47 +355,47 @@ void main() {
     });
 
     test('decode empty array', () {
-      final elt = parse('<array><data /></array>').firstChild;
+      final elt = XmlDocument.parse('<array><data /></array>').firstChild;
       expect(arrayCodec.decode(elt, null), equals([]));
     });
 
     test('throws for <string>1</string>', () {
-      final elt = parse('<string>1</string>').firstChild;
+      final elt = XmlDocument.parse('<string>1</string>').firstChild;
       expect(() => arrayCodec.decode(elt, null), throwsArgumentError);
     });
   });
 
   group('decode method', () {
     test('should accept <int>', () {
-      final elt = parse('<int>123</int>').firstChild;
+      final elt = XmlDocument.parse('<int>123</int>').firstChild;
       expect(decode(elt, standardCodecs), equals(123));
     });
 
     test('should accept <i4>', () {
-      final elt = parse('<i4>4567</i4>').firstChild;
+      final elt = XmlDocument.parse('<i4>4567</i4>').firstChild;
       expect(decode(elt, standardCodecs), equals(4567));
     });
 
     test('should accept <boolean>', () {
-      final elt = parse('<boolean>1</boolean>').firstChild;
+      final elt = XmlDocument.parse('<boolean>1</boolean>').firstChild;
       expect(decode(elt, standardCodecs), equals(true));
     });
 
     test('should accept <double>', () {
-      final elt = parse('<double>1.45</double>').firstChild;
+      final elt = XmlDocument.parse('<double>1.45</double>').firstChild;
       expect(decode(elt, standardCodecs), equals(1.45));
     });
 
     test('should accept <dateTime.iso8601>', () {
-      final elt =
-          parse('<dateTime.iso8601>19980717T14:08:55</dateTime.iso8601>')
-              .firstChild;
+      final elt = XmlDocument.parse(
+              '<dateTime.iso8601>19980717T14:08:55</dateTime.iso8601>')
+          .firstChild;
       expect(decode(elt, standardCodecs),
           equals(DateTime(1998, 7, 17, 14, 8, 55)));
     });
 
     test('should accept <base64>', () {
-      final elt = parse('<base64>AQID</base64>').firstChild;
+      final elt = XmlDocument.parse('<base64>AQID</base64>').firstChild;
       expect(decode(elt, standardCodecs), const TypeMatcher<Base64Value>());
       expect((decode(elt, standardCodecs) as Base64Value).base64String,
           equals('AQID'));
@@ -428,17 +404,17 @@ void main() {
     });
 
     test('should accept <struct>', () {
-      final elt = parse('<struct></struct>').firstChild;
+      final elt = XmlDocument.parse('<struct></struct>').firstChild;
       expect(decode(elt, standardCodecs), equals({}));
     });
 
     test('should accept <array>', () {
-      final elt = parse('<array><data></data></array>').firstChild;
+      final elt = XmlDocument.parse('<array><data></data></array>').firstChild;
       expect(decode(elt, standardCodecs), equals([]));
     });
 
     test('throws on <unknown>', () {
-      final elt = parse('<unknown>1</unknown>').firstChild;
+      final elt = XmlDocument.parse('<unknown>1</unknown>').firstChild;
       expect(() => decode(elt, standardCodecs), throwsArgumentError);
     });
   });

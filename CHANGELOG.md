@@ -1,5 +1,11 @@
 # Changelog
 
+
+## 0.4.0-nullsafety.0 (2021-01-29)
+
+- Migrate to null safe dart
+- Only Uri accepted as url parameter on client to mimic change by `package:http`. Call `Uri.parse(url)` if you previously passed in a string 
+
 ## 0.3.0 (2020-05-11)
 
 - Add server support

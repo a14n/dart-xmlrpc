@@ -13,7 +13,7 @@ import 'package:test/test.dart';
 import 'package:xml_rpc/client.dart';
 
 void main() {
-  HttpServer httpServer;
+  late HttpServer httpServer;
 
   setUp(() => startServer(9000).then((e) => httpServer = e));
   tearDown(() => httpServer.close(force: true));
@@ -39,7 +39,7 @@ void main() {
         r.response.close();
       }));
     }));
-    call('http://localhost:${httpServer.port}', 'm1', [])
+    call(Uri.parse('http://localhost:${httpServer.port}'), 'm1', [])
         .then(expectAsync1((e) {
       expect(e, equals('South Dakota'));
     }));
@@ -48,7 +48,7 @@ void main() {
   test('Specify encoding', () {
     httpServer.listen(expectAsync1((r) {
       expect(r.headers.contentLength, isNotNull);
-      expect(r.headers.contentType.charset, equals('iso-8859-1'));
+      expect(r.headers.contentType!.charset, equals('iso-8859-1'));
       expect(r.method, equals('POST'));
       latin1.decodeStream(r).then(expectAsync1((body) {
         expect(
@@ -67,7 +67,8 @@ void main() {
         r.response.close();
       }));
     }));
-    call('http://localhost:${httpServer.port}', 'éà', [], encoding: latin1)
+    call(Uri.parse('http://localhost:${httpServer.port}'), 'éà', [],
+            encoding: latin1)
         .then(expectAsync1((e) {
       expect(e, equals('éçàù'));
     }));
@@ -75,8 +76,8 @@ void main() {
 
   test('Call with error', () {
     httpServer.listen((_) => httpServer.close(force: true));
-    call('http://localhost:${httpServer.port}', 'm1', [1])
-        .catchError(expectAsync1((e) {
+    call(Uri.parse('http://localhost:${httpServer.port}'), 'm1', [1])
+        .catchError(expectAsync1((dynamic e) {
       expect(e, const TypeMatcher<ClientException>());
     }));
   });

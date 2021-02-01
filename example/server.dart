@@ -15,7 +15,7 @@ void main() async {
   try {
     print('calling service');
     var result = await client.call(
-      'http://localhost:$port',
+      Uri.parse('http://localhost:$port'),
       'hello',
       [
         {'api_key': 'yourApiKey'}
