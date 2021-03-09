@@ -1,10 +1,9 @@
 # Changelog
 
-
-## 0.4.0 (2021-03-9)
+## 0.4.0 (2021-03-09)
 
 - Migrate to null safe dart
-- Only Uri accepted as url parameter on client to mimic change by `package:http`. Call `Uri.parse(url)` if you previously passed in a string 
+- Only Uri accepted as url parameter on client to mimic change by `package:http`. Call `Uri.parse(url)` if you previously passed in a string
 
 ## 0.3.0 (2020-05-11)
 
