@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:xml/xml.dart';
 
 import 'src/common.dart';

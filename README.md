@@ -1,6 +1,6 @@
 # xml_rpc
 
-[![Build Status](https://travis-ci.org/a14n/dart-xmlrpc.svg?branch=master)](https://travis-ci.org/a14n/dart-xmlrpc)
+[![Build Status](https://github.com/a14n/dart-xmlrpc/actions/workflows/dart.yml/badge.svg)](https://github.com/a14n/dart-xmlrpc/actions/workflows/dart.yml)
 
 A library to communicate through the [XML-RPC protocol][xmlrpc].
 
