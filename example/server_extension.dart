@@ -1,4 +1,3 @@
-import 'package:pedantic/pedantic.dart';
 import 'package:xml_rpc/client.dart' as client;
 import 'package:xml_rpc/simple_server.dart' as server;
 import 'package:xml_rpc/src/converter_extension.dart';
@@ -16,8 +15,8 @@ void main() async {
   await callService();
 
   // Asyncronous calls to the service
-  unawaited(callService());
-  unawaited(callService());
+  callService();
+  callService();
   await Future.delayed(Duration(milliseconds: 10));
 
   try {
