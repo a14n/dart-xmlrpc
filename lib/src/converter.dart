@@ -219,9 +219,9 @@ class _ArrayCodec implements Codec<List> {
     if (value is! List) throw ArgumentError();
 
     final values = <XmlNode>[];
-    value.forEach((e) {
+    for (var e in value) {
       values.add(XmlElement(XmlName('value'), [], [encode!(e)]));
-    });
+    }
     final data = XmlElement(XmlName('data'), [], values);
     return XmlElement(XmlName('array'), [], [data]);
   }

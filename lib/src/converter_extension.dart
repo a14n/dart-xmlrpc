@@ -14,7 +14,7 @@ final i8Codec = SimpleCodec<int>(
 
 final nilCodec = _NilCodec();
 
-class _NilCodec implements Codec<Null> {
+class _NilCodec implements Codec<Object?> {
   @override
   XmlNode encode(Object? value, XmlCodecEncodeSignature? encode) {
     if (value != null) throw ArgumentError();
@@ -23,7 +23,7 @@ class _NilCodec implements Codec<Null> {
   }
 
   @override
-  Null decode(XmlNode? node, XmlCodecDecodeSignature? decode) {
+  Object? decode(XmlNode? node, XmlCodecDecodeSignature? decode) {
     if (!(node is XmlElement && node.name.local == 'nil')) {
       throw ArgumentError();
     }
