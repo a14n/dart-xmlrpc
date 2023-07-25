@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 (2023-07-25)
+
+- Migrate to Dart 3
+
 ## 0.4.0 (2021-03-09)
 
 - Migrate to null safe dart
