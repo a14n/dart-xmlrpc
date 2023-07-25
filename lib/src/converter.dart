@@ -37,24 +37,23 @@ class SimpleCodec<T> implements Codec<T> {
   final T Function(String text)? decodeValue;
 
   @override
-  XmlNode encode(Object? value, XmlCodecEncodeSignature? encode) {
-    if (value is! T) throw ArgumentError();
-
-    return XmlElement(
-      XmlName(nodeLocalName),
-      [],
-      [XmlText(encodeValue(value))],
-    );
-  }
+  XmlNode encode(Object? value, XmlCodecEncodeSignature? encode) =>
+      switch (value) {
+        _ when value is T => XmlElement(
+            XmlName(nodeLocalName),
+            [],
+            [XmlText(encodeValue(value))],
+          ),
+        _ => throw ArgumentError(),
+      };
 
   @override
-  T decode(XmlNode? node, XmlCodecDecodeSignature? decode) {
-    if (!(node is XmlElement && node.name.local == nodeLocalName)) {
-      throw ArgumentError();
-    }
-
-    return decodeValue!(node.text);
-  }
+  T decode(XmlNode? node, XmlCodecDecodeSignature? decode) => switch (node) {
+        XmlElement(name: XmlName(:final local), :final innerText)
+            when local == nodeLocalName =>
+          decodeValue!(innerText),
+        _ => throw ArgumentError()
+      };
 }
 
 final intCodec = _IntCodec();
@@ -62,36 +61,35 @@ final intCodec = _IntCodec();
 class _IntCodec implements Codec<int> {
   @override
   XmlNode encode(Object? value, XmlCodecEncodeSignature? encode) {
-    if (!(value is int && value >= -2147483648 && value <= 2147483647)) {
-      throw ArgumentError();
-    }
-
-    return XmlElement(
-      XmlName('int'),
-      [],
-      [XmlText(value.toString())],
-    );
+    return switch (value) {
+      int() when value >= -2147483648 && value <= 2147483647 => XmlElement(
+          XmlName('int'),
+          [],
+          [XmlText(value.toString())],
+        ),
+      _ => throw ArgumentError(),
+    };
   }
 
   @override
-  int decode(XmlNode? node, XmlCodecDecodeSignature? decode) {
-    if (!(node is XmlElement && ['int', 'i4'].contains(node.name.local))) {
-      throw ArgumentError();
-    }
-
-    return int.parse(node.text);
-  }
+  int decode(XmlNode? node, XmlCodecDecodeSignature? decode) => switch (node) {
+        XmlElement(name: XmlName(local: 'int' || 'i4'), :final innerText) =>
+          int.parse(innerText),
+        _ => throw ArgumentError()
+      };
 }
 
 final boolCodec = SimpleCodec<bool>(
   nodeLocalName: 'boolean',
-  encodeValue: (value) => value ? '1' : '0',
-  decodeValue: (text) {
-    if (text != '0' && text != '1') {
-      throw StateError(
-          'The element <boolean> must contain 0 or 1. Not "$text"');
-    }
-    return text == '1';
+  encodeValue: (value) => switch (value) {
+    false => '0',
+    true => '1',
+  },
+  decodeValue: (text) => switch (text) {
+    '0' => false,
+    '1' => true,
+    _ => throw StateError(
+        'The element <boolean> must contain 0 or 1. Not "$text"'),
   },
 );
 
@@ -106,15 +104,14 @@ class _StringCodec extends SimpleCodec<String> {
         );
 
   @override
-  String decode(XmlNode? node, XmlCodecDecodeSignature? decode) {
-    if (!(node == null || // with empty String that leads to "<value />"
-        node is XmlText ||
-        node is XmlElement && node.name.local == 'string')) {
-      throw ArgumentError();
-    }
-
-    return node == null ? '' : node.text;
-  }
+  String decode(XmlNode? node, XmlCodecDecodeSignature? decode) =>
+      switch (node) {
+        null => '', // with empty String that leads to "<value />"
+        XmlText(:final value) => value,
+        XmlElement(name: XmlName(local: 'string'), :final innerText) =>
+          innerText,
+        _ => throw ArgumentError()
+      };
 }
 
 final doubleCodec = SimpleCodec<double>(
@@ -163,7 +160,7 @@ class _FaultCodec implements Codec<Fault> {
     }
     final struct = <String, Object?>{};
     for (final member in node.findElements('member')) {
-      final name = member.findElements('name').first.text;
+      final name = member.findElements('name').first.innerText;
       final valueElt = member.findElements('value').first;
       final elt = getValueContent(valueElt);
       struct[name] = decode!(elt);
@@ -202,7 +199,7 @@ class _StructCodec implements Codec<Map<String, dynamic>> {
 
     final struct = <String, dynamic>{};
     for (final member in node.findElements('member')) {
-      final name = member.findElements('name').first.text;
+      final name = member.findElements('name').first.innerText;
       final valueElt = member.findElements('value').first;
       final elt = getValueContent(valueElt);
       struct[name] = decode!(elt);

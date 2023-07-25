@@ -22,7 +22,7 @@ class Fault {
       other is Fault && code == other.code && text == other.text;
 
   @override
-  int get hashCode => (23 * 37 + code.hashCode) * 37 + text.hashCode;
+  int get hashCode => Object.hash(code, text);
 }
 
 /// A container for a base64 encoded value.

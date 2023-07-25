@@ -27,7 +27,7 @@ class XmlRpcHandler {
     final params = <Object?>[];
     try {
       final methodCall = document.findElements('methodCall').first;
-      methodName = methodCall.findElements('methodName').first.text;
+      methodName = methodCall.findElements('methodName').first.innerText;
       var paramsElements = methodCall.findElements('params');
       if (paramsElements.isNotEmpty) {
         final args = paramsElements.first.findElements('param');

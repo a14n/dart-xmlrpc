@@ -16,18 +16,16 @@ final nilCodec = _NilCodec();
 
 class _NilCodec implements Codec<Object?> {
   @override
-  XmlNode encode(Object? value, XmlCodecEncodeSignature? encode) {
-    if (value != null) throw ArgumentError();
-
-    return XmlElement(XmlName('nil'));
-  }
+  XmlNode encode(Object? value, XmlCodecEncodeSignature? encode) =>
+      switch (value) {
+        null => XmlElement(XmlName('nil')),
+        _ => throw ArgumentError(),
+      };
 
   @override
-  Object? decode(XmlNode? node, XmlCodecDecodeSignature? decode) {
-    if (!(node is XmlElement && node.name.local == 'nil')) {
-      throw ArgumentError();
-    }
-
-    return null;
-  }
+  Object? decode(XmlNode? node, XmlCodecDecodeSignature? decode) =>
+      switch (node) {
+        XmlElement(name: XmlName(local: 'nil')) => null,
+        _ => throw ArgumentError(),
+      };
 }

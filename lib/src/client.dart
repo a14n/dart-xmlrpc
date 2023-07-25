@@ -39,22 +39,23 @@ Future call(
 
   final xml = convertMethodCall(methodName, params, encodeCodecs).toXmlString();
 
-  final _headers = <String, String>{
-    'Content-Type': 'text/xml',
-    if (headers != null) ...headers,
-  };
-
   final post = httpPost ?? http.post;
-  final response =
-      await post(url, headers: _headers, body: xml, encoding: encoding);
+  final response = await post(
+    url,
+    headers: {
+      'Content-Type': 'text/xml',
+      ...?headers,
+    },
+    body: xml,
+    encoding: encoding,
+  );
   if (response.statusCode != 200) throw response;
   final body = response.body;
   final value = decodeResponse(XmlDocument.parse(body), decodeCodecs);
-  if (value is Fault) {
-    throw value;
-  } else {
-    return value;
-  }
+  return switch (value) {
+    Fault() => throw value,
+    _ => value,
+  };
 }
 
 XmlDocument convertMethodCall(
@@ -103,14 +104,15 @@ dynamic decodeResponse(XmlDocument document, List<Codec> decodeCodecs) {
         .first
         .findElements('member');
     for (final member in members) {
-      final name = member.findElements('name').first.text;
+      final name = member.findElements('name').first.innerText;
       final valueElt = member.findElements('value').first;
       final elt = getValueContent(valueElt);
       final value = decode(elt, decodeCodecs);
-      if (name == 'faultCode') {
-        faultCode = value as int;
-      } else if (name == 'faultString') {
-        faultString = value as String;
+      switch (name) {
+        case 'faultCode':
+          faultCode = value as int;
+        case 'faultString':
+          faultString = value as String;
       }
     }
     return Fault(faultCode, faultString);
