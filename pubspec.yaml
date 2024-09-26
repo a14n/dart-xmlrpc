@@ -7,8 +7,8 @@ homepage: https://github.com/a14n/dart-xmlrpc
 environment:
   sdk: ">=3.0.0 <4.0.0"
 dependencies:
-  collection: ^1.19.0
-  http: ^1.2.2
+  collection: ^1.18.0
+  http: ^1.2.0
   meta: ^1.15.0
   xml: ^6.5.0
 dev_dependencies:
