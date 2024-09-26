@@ -9,7 +9,7 @@ environment:
 dependencies:
   collection: ^1.19.0
   http: ^1.2.2
-  meta: ^1.16.0
+  meta: ^1.15.0
   xml: ^6.5.0
 dev_dependencies:
   lints: ^5.0.0
