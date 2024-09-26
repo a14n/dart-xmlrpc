@@ -17,6 +17,8 @@
 ///         print(error);
 ///       }
 ///     }
+library;
+
 import 'dart:async';
 import 'dart:convert' show Encoding, utf8;
 

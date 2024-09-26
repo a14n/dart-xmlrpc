@@ -16,11 +16,11 @@ class SimpleXmlRpcServer extends XmlRpcServer {
 
   /// Creates a [SimpleXmlRpcServer]
   SimpleXmlRpcServer({
-    required String host,
-    required int port,
-    required XmlRpcHandler handler,
-    Encoding encoding = utf8,
-  }) : super(host: host, port: port, handler: handler, encoding: encoding);
+    required super.host,
+    required super.port,
+    required super.handler,
+    super.encoding,
+  });
 
   /// Starts up the [_httpServer] and starts listening to requests
   @override
