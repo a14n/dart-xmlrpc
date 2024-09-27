@@ -2,8 +2,6 @@
 // source code is governed by a BSD-style license that can be found in the
 // LICENSE file.
 
-library xml_rpc.src.client.test;
-
 import 'package:test/test.dart';
 import 'package:xml/xml.dart' show XmlDocument;
 import 'package:xml_rpc/src/client.dart';
