@@ -3,7 +3,7 @@
 // LICENSE file.
 
 /// A client library for [XML-RPC](http://xmlrpc.scripting.com/spec.html)
-/// protocol that also support [XML-RPC Extension Types](http://xmlrpc-c.sourceforge.net/doc/libxmlrpc.html#extensiontype).
+/// protocol that also support [XML-RPC Extension Types](https://xmlrpc-c.sourceforge.net/doc/libxmlrpc.html#extensiontype).
 ///
 /// You can make method calls with:
 ///
