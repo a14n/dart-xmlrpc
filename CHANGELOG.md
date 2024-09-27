@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1 (2024-09-27)
+
+- improve pub.dev score
+- bump dependency versions
+
 ## 0.5.0 (2023-07-25)
 
 - Migrate to Dart 3
