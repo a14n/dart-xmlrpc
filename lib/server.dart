@@ -93,7 +93,7 @@ abstract class XmlRpcException implements Exception {
 }
 
 class XmlRpcRequestFormatException extends XmlRpcException {
-  XmlRpcRequestFormatException([Object? cause]) : super(cause);
+  XmlRpcRequestFormatException([super.cause]);
 }
 
 /// When an exception occurs in the real method call
@@ -106,10 +106,10 @@ class XmlRpcMethodNotFoundException extends XmlRpcException {
 
 /// When an exception occurs in the real method call
 class XmlRpcCallException extends XmlRpcException {
-  XmlRpcCallException([Object? cause]) : super(cause);
+  XmlRpcCallException([super.cause]);
 }
 
 /// When an exception occurs in response encoding
 class XmlRpcResponseEncodingException extends XmlRpcException {
-  XmlRpcResponseEncodingException([Object? cause]) : super(cause);
+  XmlRpcResponseEncodingException([super.cause]);
 }
